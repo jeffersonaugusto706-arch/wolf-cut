@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WolfCut Studio - Editor de Vídeo, Dublagem & SFX</title>
+  <title>WolfCut Studio — Editor de Vídeo, Dublagem &amp; SFX</title>
   <style>
     :root {
-      --bg-dark: #0a0a0c;
-      --bg-panel: #141418;
-      --bg-card: #1e1e24;
-      --border: #2c2c35;
+      --bg-dark: #09090b;
+      --bg-panel: #121216;
+      --bg-card: #1b1b21;
+      --bg-elevated: #23232b;
+      --border: #2b2b35;
+      --border-strong: #3f3f4d;
       --accent: #e11d48;
       --accent-hover: #be123c;
-      --silver: #d4d4d8;
+      --accent-soft: rgba(225, 29, 72, 0.16);
+      --silver: #e4e4e7;
+      --chrome: linear-gradient(135deg, #ffffff 0%, #d4d4d8 45%, #71717a 100%);
       --text-main: #f4f4f5;
       --text-muted: #a1a1aa;
       --dub-color: #3b82f6;
@@ -25,7 +29,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     body {
@@ -38,35 +42,49 @@
       user-select: none;
     }
 
+    /* Top Bar */
     header {
-      height: 54px;
-      background: var(--bg-panel);
+      height: 52px;
+      background: linear-gradient(180deg, #16161b 0%, #101014 100%);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
+      padding: 0 14px;
+      gap: 12px;
+      flex-shrink: 0;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: 0.5px;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.6px;
       color: var(--silver);
     }
 
-    .brand span {
-      background: linear-gradient(135deg, #fff, #71717a);
+    .brand-badge {
+      background: linear-gradient(135deg, #27272f, #141418);
+      border: 1px solid var(--border-strong);
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .brand span.title-grad {
+      background: var(--chrome);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .header-actions {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
     }
 
@@ -74,71 +92,96 @@
       background: var(--bg-card);
       color: var(--text-main);
       border: 1px solid var(--border);
-      padding: 7px 14px;
+      padding: 7px 12px;
       border-radius: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      transition: all 0.15s ease;
+      transition: background 0.14s ease, border-color 0.14s ease, transform 0.08s ease;
     }
 
     button:hover:not(:disabled) {
-      background: #27272f;
-      border-color: #3f3f46;
+      background: var(--bg-elevated);
+      border-color: var(--border-strong);
+    }
+
+    button:active:not(:disabled) {
+      transform: scale(0.98);
     }
 
     button.primary {
       background: var(--accent);
       border-color: var(--accent);
       color: #fff;
+      box-shadow: 0 4px 16px rgba(225, 29, 72, 0.28);
     }
 
     button.primary:hover:not(:disabled) {
       background: var(--accent-hover);
+      border-color: var(--accent-hover);
     }
 
     button:disabled {
-      opacity: 0.45;
+      opacity: 0.4;
       cursor: not-allowed;
     }
 
-    .workspace {
+    /* Stage + Inspector Workspace */
+    .stage-workspace {
       flex: 1;
+      min-height: 0;
       display: flex;
       overflow: hidden;
     }
 
-    .preview-section {
+    .preview-stage {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 16px;
+      justify-content: space-between;
+      padding: 12px 16px 10px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(225, 29, 72, 0.06) 0%, transparent 52%),
+        radial-gradient(circle at 50% 50%, #17171f 0%, #08080a 100%);
       position: relative;
-      background: radial-gradient(circle at center, #16161d 0%, #09090b 100%);
+    }
+
+    .canvas-frame {
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
     }
 
     .canvas-wrapper {
       position: relative;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(228, 228, 231, 0.08);
       border: 1px solid var(--border);
       background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
       max-width: 100%;
-      max-height: calc(100% - 56px);
+      max-height: 100%;
       overflow: hidden;
+      border-radius: 6px;
     }
 
     canvas {
       display: block;
       max-width: 100%;
-      max-height: 48vh;
+      max-height: calc(100vh - 355px);
+      width: auto;
+      height: auto;
       object-fit: contain;
     }
 
@@ -149,97 +192,139 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      background: rgba(10, 10, 12, 0.9);
+      gap: 10px;
+      background: rgba(10, 10, 13, 0.92);
       text-align: center;
       padding: 20px;
+      min-width: 280px;
+      min-height: 210px;
+    }
+
+    .empty-state h3 {
+      font-size: 15px;
+      color: var(--silver);
     }
 
     .empty-state p {
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 12.5px;
+      max-width: 300px;
+      line-height: 1.45;
     }
 
+    /* InShot-Style Transport Bar */
     .transport-bar {
-      margin-top: 12px;
+      margin-top: 8px;
       display: flex;
       align-items: center;
-      gap: 16px;
-      background: var(--bg-panel);
-      padding: 6px 18px;
+      gap: 12px;
+      background: rgba(20, 20, 26, 0.94);
+      padding: 5px 14px;
       border-radius: 999px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      flex-shrink: 0;
+    }
+
+    .transport-btn {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
     }
 
     .timecode {
-      font-family: monospace;
-      font-size: 13px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 12.5px;
       color: var(--silver);
+      min-width: 124px;
+      text-align: center;
     }
 
-    .tool-panel {
-      width: 375px;
+    /* Contextual Tool Inspector Drawer (InShot style) */
+    .inspector-drawer {
+      width: 356px;
       background: var(--bg-panel);
       border-left: 1px solid var(--border);
       display: flex;
       flex-direction: column;
+      flex-shrink: 0;
+      transition: width 0.18s ease;
     }
 
-    .tool-tabs {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
+    .inspector-drawer.collapsed {
+      width: 0;
+      border-left: none;
+      overflow: hidden;
+    }
+
+    .inspector-header {
+      height: 40px;
+      padding: 0 14px;
       border-bottom: 1px solid var(--border);
-      background: #101014;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #101015;
+      flex-shrink: 0;
     }
 
-    .tab-btn {
-      border: none;
-      border-radius: 0;
-      background: transparent;
-      flex-direction: column;
-      padding: 9px 2px;
-      font-size: 10px;
-      color: var(--text-muted);
-      gap: 3px;
-      border-bottom: 2px solid transparent;
+    .inspector-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: var(--silver);
+      display: flex;
+      align-items: center;
+      gap: 7px;
     }
 
-    .tab-btn.active {
-      color: #fff;
-      background: var(--bg-panel);
-      border-bottom-color: var(--accent);
+    .close-inspector-btn {
+      padding: 3px 8px;
+      font-size: 11px;
+      border-radius: 6px;
     }
 
-    .tool-content {
+    .inspector-body {
       flex: 1;
-      padding: 14px;
       overflow-y: auto;
+      padding: 12px 14px 16px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
-    .tab-pane {
+    .tool-pane {
       display: none;
       flex-direction: column;
       gap: 12px;
     }
 
-    .tab-pane.active {
+    .tool-pane.active {
       display: flex;
     }
 
     .control-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .control-group label {
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+    }
+
+    .control-group label span.val-pill {
+      color: var(--silver);
+      font-family: monospace;
+      font-size: 11px;
+      background: var(--bg-card);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
     }
 
     input[type="range"] {
@@ -252,52 +337,88 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 13px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 12.5px;
       outline: none;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--accent);
     }
 
     .grid-options {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 7px;
     }
 
     .option-card {
       justify-content: center;
-      padding: 9px 8px;
-      font-size: 12px;
+      padding: 8px 8px;
+      font-size: 11.5px;
     }
 
     .option-card.selected {
       border-color: var(--accent);
-      background: rgba(225, 29, 72, 0.15);
+      background: var(--accent-soft);
       color: #fff;
     }
 
+    /* Voice FX Preset Grid */
+    .voice-fx-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .voice-chip {
+      justify-content: flex-start;
+      padding: 7px 9px;
+      font-size: 11px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      text-align: left;
+      line-height: 1.2;
+    }
+
+    .voice-chip.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: #fff;
+    }
+
+    .voice-chip small {
+      display: block;
+      font-size: 9.5px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    /* Dubbing Studio */
     .record-box {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 11px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .mic-btn {
-      width: 56px;
-      height: 56px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
       background: var(--accent);
-      border: 4px solid rgba(225, 29, 72, 0.3);
+      border: 4px solid rgba(225, 29, 72, 0.28);
       color: white;
-      font-size: 20px;
-      justify-content: center;
-      transition: transform 0.2s;
+      font-size: 18px;
+      padding: 0;
     }
 
     .mic-btn.recording {
@@ -307,13 +428,13 @@
 
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-      70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+      70% { box-shadow: 0 0 0 13px rgba(239, 68, 68, 0); }
       100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
     }
 
     .vu-meter {
       width: 100%;
-      height: 8px;
+      height: 7px;
       background: #09090b;
       border-radius: 4px;
       overflow: hidden;
@@ -330,19 +451,19 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
-      max-height: 135px;
+      max-height: 122px;
       overflow-y: auto;
     }
 
     .dub-item {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      padding: 7px 10px;
+      padding: 6px 9px;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 11.5px;
       cursor: pointer;
     }
 
@@ -355,66 +476,77 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
+      min-width: 0;
+    }
+
+    .dub-item-info span {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .take-editor-box {
       background: var(--bg-card);
-      border: 1px solid #353542;
+      border: 1px solid var(--border-strong);
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
     }
 
     .nudge-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
+      gap: 5px;
     }
 
     .nudge-btn {
-      padding: 6px 4px;
+      padding: 5px 4px;
       font-size: 11px;
-      justify-content: center;
     }
 
     .sfx-pad {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 7px;
     }
 
     .sfx-btn {
-      padding: 10px 8px;
-      font-size: 12px;
-      justify-content: center;
-      background: #1a1a22;
-      border-color: #343440;
+      padding: 9px 8px;
+      font-size: 11.5px;
+      background: var(--bg-card);
+      border-color: var(--border);
     }
 
     .sfx-btn:hover:not(:disabled) {
       border-color: var(--sfx-color);
-      background: rgba(245, 158, 11, 0.12);
+      background: rgba(245, 158, 11, 0.13);
     }
 
+    /* Bottom Multitrack Timeline */
     .timeline-section {
-      height: 235px;
+      height: 196px;
       background: var(--bg-panel);
       border-top: 1px solid var(--border);
       display: flex;
       flex-direction: column;
+      flex-shrink: 0;
     }
 
     .timeline-header {
-      height: 30px;
-      padding: 0 16px;
+      height: 28px;
+      padding: 0 14px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 11px;
       color: var(--text-muted);
+      background: #0f0f13;
+      flex-shrink: 0;
     }
 
     .tracks-container {
@@ -422,10 +554,10 @@
       position: relative;
       overflow-x: auto;
       overflow-y: auto;
-      padding: 10px 16px;
+      padding: 8px 14px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
     }
 
@@ -433,11 +565,12 @@
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 114px;
+      left: 112px;
       width: 2px;
-      background: #fff;
-      z-index: 20;
+      background: var(--accent);
+      z-index: 25;
       pointer-events: none;
+      box-shadow: 0 0 10px rgba(225, 29, 72, 0.8);
     }
 
     .playhead::before {
@@ -447,12 +580,12 @@
       left: -5px;
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-top: 8px solid #fff;
+      border-top: 8px solid var(--accent);
     }
 
     .track-row {
-      height: 38px;
-      background: #101014;
+      height: 32px;
+      background: #101015;
       border: 1px solid var(--border);
       border-radius: 6px;
       position: relative;
@@ -465,16 +598,16 @@
       position: sticky;
       left: 0;
       z-index: 10;
-      background: rgba(20, 20, 24, 0.95);
-      padding: 4px 8px;
-      font-size: 11px;
-      font-weight: 600;
+      background: rgba(18, 18, 22, 0.96);
+      padding: 2px 8px;
+      font-size: 10.5px;
+      font-weight: 700;
       color: var(--silver);
       border-right: 1px solid var(--border);
       height: 100%;
       display: flex;
       align-items: center;
-      min-width: 98px;
+      min-width: 92px;
     }
 
     .track-lane {
@@ -485,8 +618,8 @@
 
     .clip-block {
       position: absolute;
-      top: 4px;
-      bottom: 4px;
+      top: 3px;
+      bottom: 3px;
       border-radius: 4px;
       font-size: 10px;
       padding: 0 6px;
@@ -498,20 +631,20 @@
     }
 
     .video-clip {
-      background: rgba(139, 92, 246, 0.35);
+      background: rgba(139, 92, 246, 0.34);
       border: 1px solid var(--video-color);
       color: #ede9fe;
     }
 
     .dub-clip {
-      background: rgba(59, 130, 246, 0.35);
+      background: rgba(59, 130, 246, 0.36);
       border: 1px solid var(--dub-color);
       color: #dbeafe;
       cursor: grab;
     }
 
     .dub-clip.selected {
-      outline: 2px solid #fff;
+      outline: 2px solid #ffffff;
       z-index: 5;
     }
 
@@ -527,10 +660,56 @@
       color: #d1fae5;
     }
 
+    /* InShot Bottom Tool Dock */
+    .inshot-dock {
+      height: 58px;
+      background: #0d0d11;
+      border-top: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 10px;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+
+    .dock-btn {
+      min-width: 74px;
+      height: 46px;
+      flex-direction: column;
+      gap: 2px;
+      padding: 4px 8px;
+      border-radius: 9px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+
+    .dock-btn .dock-icon {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .dock-btn:hover:not(:disabled) {
+      background: var(--bg-card);
+      border-color: var(--border);
+      color: var(--text-main);
+    }
+
+    .dock-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    /* Export Overlay */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.82);
       display: none;
       align-items: center;
       justify-content: center;
@@ -539,14 +718,14 @@
 
     .modal-box {
       background: var(--bg-panel);
-      border: 1px solid var(--border);
-      padding: 24px;
+      border: 1px solid var(--border-strong);
+      padding: 22px;
       border-radius: 12px;
       width: 340px;
       text-align: center;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .progress-bar {
@@ -568,144 +747,162 @@
 
   <header>
     <div class="brand">
-      🎬 <span>WOLFCUT STUDIO — DUBLAGEM, VOZ & SFX</span>
+      🎬 <span class="title-grad">WOLFCUT STUDIO</span>
+      <span class="brand-badge">InShot Flow</span>
     </div>
     <div class="header-actions">
       <input type="file" id="videoInput" accept="video/*" hidden />
-      <button onclick="document.getElementById('videoInput').click()">📁 Importar Vídeo</button>
-      <button class="primary" id="exportBtn" disabled onclick="exportVideo()">⬇️ Exportar Vídeo</button>
+      <button onclick="document.getElementById('videoInput').click()">📁 Importar</button>
+      <button class="primary" id="exportBtn" disabled onclick="exportVideo()">⬇️ Exportar</button>
     </div>
   </header>
 
-  <div class="workspace">
-    <div class="preview-section">
-      <div class="canvas-wrapper" id="canvasWrapper">
-        <canvas id="previewCanvas" width="854" height="480"></canvas>
-        <div class="empty-state" id="emptyState">
-          <div style="font-size: 36px;">🎞️</div>
-          <h3>Nenhum vídeo carregado</h3>
-          <p>Importe uma cena para cortar, dublar com alterador de voz, inserir lutas e ambientação.</p>
-          <button class="primary" onclick="document.getElementById('videoInput').click()">Selecionar Vídeo</button>
+  <div class="stage-workspace">
+    <section class="preview-stage">
+      <div class="canvas-frame">
+        <div class="canvas-wrapper" id="canvasWrapper">
+          <canvas id="previewCanvas" width="854" height="480"></canvas>
+          <div class="empty-state" id="emptyState">
+            <div style="font-size: 32px;">🎞️</div>
+            <h3>Nenhuma cena carregada</h3>
+            <p>Importe um vídeo para cortar, dublar com efeitos de voz, adicionar lutas e ambientação.</p>
+            <button class="primary" onclick="document.getElementById('videoInput').click()">Selecionar Vídeo</button>
+          </div>
         </div>
       </div>
 
       <div class="transport-bar">
-        <button id="playPauseBtn" disabled onclick="togglePlay()">▶️ Play</button>
+        <button class="transport-btn" id="playPauseBtn" disabled onclick="togglePlay()">▶️ Play</button>
         <span class="timecode" id="timeDisplay">00:00.0 / 00:00.0</span>
-        <button id="stopBtn" disabled onclick="stopPlayback()">⏹️ Início</button>
+        <button class="transport-btn" id="stopBtn" disabled onclick="stopPlayback()">⏹️ Início</button>
       </div>
-    </div>
+    </section>
 
-    <aside class="tool-panel">
-      <div class="tool-tabs">
-        <button class="tab-btn active" onclick="switchTab('dub', this)">🎙️<span>Dublar</span></button>
-        <button class="tab-btn" onclick="switchTab('sfx', this)">💥<span>Lutas</span></button>
-        <button class="tab-btn" onclick="switchTab('amb', this)">🌧️<span>Clima</span></button>
-        <button class="tab-btn" onclick="switchTab('trim', this)">✂️<span>Corte</span></button>
-        <button class="tab-btn" onclick="switchTab('canvas', this)">📐<span>Tela</span></button>
-        <button class="tab-btn" onclick="switchTab('filter', this)">🎨<span>Filtros</span></button>
+    <aside class="inspector-drawer" id="inspectorDrawer">
+      <div class="inspector-header">
+        <div class="inspector-title" id="inspectorTitle">🎙️ Dublagem &amp; Efeitos de Voz</div>
+        <button class="close-inspector-btn" onclick="toggleInspector()">✕</button>
       </div>
 
-      <div class="tool-content">
-        <div class="tab-pane active" id="tab-dub">
+      <div class="inspector-body">
+        <!-- PANE: DUBLAGEM + EFEITOS DE VOZ + CORTE DE TAKE -->
+        <div class="tool-pane active" id="pane-dub">
           <div class="record-box">
-            <div style="font-size: 13px; font-weight: 600;" id="recStatus">Pronto para gravar voz</div>
+            <div style="font-size: 12px; font-weight: 600;" id="recStatus">Pronto para gravar voz</div>
             <button class="mic-btn" id="recordBtn" disabled onclick="toggleRecording()">🎙️</button>
             <div class="vu-meter"><div class="vu-fill" id="vuFill"></div></div>
-            <div style="font-size: 11px; color: var(--text-muted);">
-              O vídeo tocará automaticamente durante a gravação para sincronia labial.
+          </div>
+
+          <div class="control-group">
+            <label>Efeito de Voz (Eco, Grave, Monstro, etc.)</label>
+            <div class="voice-fx-grid" id="voicePresetGrid">
+              <button type="button" class="voice-chip active" data-preset="normal" onclick="selectVoicePreset('normal')">
+                <div>🎙️ Normal<small>Voz natural limpa</small></div>
+              </button>
+              <button type="button" class="voice-chip" data-preset="echo" onclick="selectVoicePreset('echo')">
+                <div>🔊 Eco / Reverb<small>Repetição espacial</small></div>
+              </button>
+              <button type="button" class="voice-chip" data-preset="deep" onclick="selectVoicePreset('deep')">
+                <div>🗣️ Voz Grave<small>Vilão / Locutor</small></div>
+              </button>
+              <button type="button" class="voice-chip" data-preset="monster" onclick="selectVoicePreset('monster')">
+                <div>👾 Voz de Monstro<small>Rosnado &amp; sub-grave</small></div>
+              </button>
+              <button type="button" class="voice-chip" data-preset="demon" onclick="selectVoicePreset('demon')">
+                <div>🔥 Demônio<small>Sombras distorcidas</small></div>
+              </button>
+              <button type="button" class="voice-chip" data-preset="robot" onclick="selectVoicePreset('robot')">
+                <div>🤖 Robô<small>Modulação metálica</small></div>
+              </button>
+              <button type="button" class="voice-chip" data-preset="radio" onclick="selectVoicePreset('radio')">
+                <div>📡 Rádio / Walkie<small>Comunicação tática</small></div>
+              </button>
+              <button type="button" class="voice-chip" data-preset="cave" onclick="selectVoicePreset('cave')">
+                <div>🕳️ Caverna<small>Eco longo &amp; oco</small></div>
+              </button>
             </div>
           </div>
 
           <div class="control-group">
-            <label>Alterador de Voz (Novo Take)</label>
-            <select id="voicePreset" onchange="updateVoicePreset()">
-              <option value="normal">Normal (Sem alteração)</option>
-              <option value="villain">Grave / Vilão (Pitch Baixo)</option>
-              <option value="chipmunk">Agudo / Personagem Rápido</option>
-              <option value="radio">Rádio / Comunicador Tático</option>
-              <option value="cave">Eco / Caverna / Portal</option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <label>Takes Gravados (<span id="dubCount">0</span>)</label>
+            <label>Takes Gravados <span class="val-pill" id="dubCount">0</span></label>
             <div class="dub-list" id="dubList"></div>
           </div>
 
           <div class="take-editor-box" id="takeEditorBox">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px;" id="selectedTakeTitle">Nenhum take selecionado</strong>
-              <button id="previewTakeBtn" disabled onclick="previewSelectedTake()" style="padding:4px 8px; font-size:11px;">🔊 Ouvir</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+              <strong style="font-size:11.5px;" id="selectedTakeTitle">Nenhum take selecionado</strong>
+              <button type="button" id="previewTakeBtn" disabled onclick="previewSelectedTake()" style="padding:4px 8px; font-size:11px;">🔊 Ouvir</button>
             </div>
 
             <div class="control-group">
-              <label>Posição na Cena (Início) <span id="takeStartLabel">0.0s</span></label>
+              <label>Posição na Cena <span class="val-pill" id="takeStartLabel">0.00s</span></label>
               <input type="range" id="takeStartRange" min="0" max="10" step="0.05" value="0" disabled oninput="updateSelectedTakeStart(this.value)" />
             </div>
 
             <div class="nudge-row">
-              <button class="nudge-btn" id="nudgeMinus5" disabled onclick="nudgeSelectedTake(-0.5)">-0.5s</button>
-              <button class="nudge-btn" id="nudgeMinus1" disabled onclick="nudgeSelectedTake(-0.1)">-0.1s</button>
-              <button class="nudge-btn" id="nudgePlus1" disabled onclick="nudgeSelectedTake(0.1)">+0.1s</button>
-              <button class="nudge-btn" id="nudgePlus5" disabled onclick="nudgeSelectedTake(0.5)">+0.5s</button>
+              <button type="button" class="nudge-btn" id="nudgeMinus5" disabled onclick="nudgeSelectedTake(-0.5)">-0.5s</button>
+              <button type="button" class="nudge-btn" id="nudgeMinus1" disabled onclick="nudgeSelectedTake(-0.1)">-0.1s</button>
+              <button type="button" class="nudge-btn" id="nudgePlus1" disabled onclick="nudgeSelectedTake(0.1)">+0.1s</button>
+              <button type="button" class="nudge-btn" id="nudgePlus5" disabled onclick="nudgeSelectedTake(0.5)">+0.5s</button>
             </div>
 
             <div class="control-group">
-              <label>Corte Inicial do Áudio (Trim In) <span id="takeTrimStartLabel">0.0s</span></label>
+              <label>Corte Inicial (Trim In) <span class="val-pill" id="takeTrimStartLabel">0.00s</span></label>
               <input type="range" id="takeTrimStartRange" min="0" max="5" step="0.05" value="0" disabled oninput="updateSelectedTakeTrimStart(this.value)" />
             </div>
 
             <div class="control-group">
-              <label>Duração / Corte Final do Take <span id="takeDurationLabel">0.0s</span></label>
+              <label>Duração / Corte Final <span class="val-pill" id="takeDurationLabel">0.00s</span></label>
               <input type="range" id="takeDurationRange" min="0.2" max="10" step="0.05" value="1" disabled oninput="updateSelectedTakeDuration(this.value)" />
             </div>
 
             <div class="grid-options">
-              <button class="nudge-btn" id="snapPlayheadBtn" disabled onclick="snapTakeToPlayhead()">📍 Mover p/ Agulha</button>
-              <button class="nudge-btn" id="cutAtPlayheadBtn" disabled onclick="cutTakeAtPlayhead()">✂️ Cortar na Agulha</button>
+              <button type="button" class="nudge-btn" id="snapPlayheadBtn" disabled onclick="snapTakeToPlayhead()">📍 Mover p/ Agulha</button>
+              <button type="button" class="nudge-btn" id="cutAtPlayheadBtn" disabled onclick="cutTakeAtPlayhead()">✂️ Cortar na Agulha</button>
             </div>
           </div>
 
           <div class="control-group">
-            <label>Volume Áudio Original <span id="origVolLabel">30%</span></label>
+            <label>Áudio Original <span class="val-pill" id="origVolLabel">30%</span></label>
             <input type="range" id="origVol" min="0" max="1" step="0.05" value="0.3" oninput="updateVolumes()" />
           </div>
 
           <div class="control-group">
-            <label>Volume da Dublagem <span id="dubVolLabel">100%</span></label>
+            <label>Volume da Dublagem <span class="val-pill" id="dubVolLabel">100%</span></label>
             <input type="range" id="dubVol" min="0" max="1.5" step="0.05" value="1" oninput="updateVolumes()" />
           </div>
         </div>
 
-        <div class="tab-pane" id="tab-sfx">
-          <p style="font-size: 12px; color: var(--text-muted);">
-            Clique em um efeito para disparar na posição atual da agulha e adicionar na trilha de lutas.
+        <!-- PANE: LUTAS (SFX) -->
+        <div class="tool-pane" id="pane-sfx">
+          <p style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4;">
+            Dispare efeitos de impacto na posição atual da agulha para sincronizar golpes e cenas de ação.
           </p>
           <div class="sfx-pad">
-            <button class="sfx-btn" onclick="triggerFightSfx('punch')">👊 Soco / Impacto</button>
-            <button class="sfx-btn" onclick="triggerFightSfx('whoosh')">⚡ Chicote / Golpe</button>
-            <button class="sfx-btn" onclick="triggerFightSfx('explosion')">💣 Explosão</button>
-            <button class="sfx-btn" onclick="triggerFightSfx('laser')">🔫 Laser / Energia</button>
+            <button type="button" class="sfx-btn" onclick="triggerFightSfx('punch')">👊 Soco / Impacto</button>
+            <button type="button" class="sfx-btn" onclick="triggerFightSfx('whoosh')">⚡ Chicote / Golpe</button>
+            <button type="button" class="sfx-btn" onclick="triggerFightSfx('explosion')">💣 Explosão</button>
+            <button type="button" class="sfx-btn" onclick="triggerFightSfx('laser')">🔫 Laser / Energia</button>
           </div>
 
           <div class="control-group">
-            <label>Volume Efeitos de Luta <span id="sfxVolLabel">90%</span></label>
+            <label>Volume de Lutas <span class="val-pill" id="sfxVolLabel">90%</span></label>
             <input type="range" id="sfxVol" min="0" max="1.5" step="0.05" value="0.9" oninput="updateVolumes()" />
           </div>
 
           <div class="control-group">
-            <label>Efeitos Inseridos (<span id="sfxCount">0</span>)</label>
+            <label>Efeitos Inseridos <span class="val-pill" id="sfxCount">0</span></label>
             <div class="dub-list" id="sfxList"></div>
           </div>
         </div>
 
-        <div class="tab-pane" id="tab-amb">
+        <!-- PANE: AMBIENTAÇÃO -->
+        <div class="tool-pane" id="pane-amb">
           <div class="control-group">
             <label>Ambientação Contínua</label>
             <select id="ambientPreset" onchange="updateAmbientPreset()">
               <option value="none">Nenhuma (Silêncio)</option>
-              <option value="rain">🌧️ Chuva & Tempestade</option>
+              <option value="rain">🌧️ Chuva &amp; Tempestade</option>
               <option value="wind">🌌 Vento / Espaço Profundo</option>
               <option value="city">🏙️ Cidade / Movimento Urbano</option>
               <option value="room">🏠 Sala / Atmosfera Interna</option>
@@ -713,20 +910,83 @@
           </div>
 
           <div class="control-group">
-            <label>Volume da Ambientação <span id="ambVolLabel">40%</span></label>
+            <label>Volume da Ambientação <span class="val-pill" id="ambVolLabel">40%</span></label>
             <input type="range" id="ambVol" min="0" max="1" step="0.05" value="0.4" oninput="updateVolumes()" />
+          </div>
+        </div>
+
+        <!-- PANE: CORTE & VELOCIDADE -->
+        <div class="tool-pane" id="pane-trim">
+          <div class="control-group">
+            <label>Início do Corte (Trim In) <span class="val-pill" id="trimStartLabel">0.0s</span></label>
+            <input type="range" id="trimStart" min="0" max="10" step="0.1" value="0" oninput="updateTrim()" />
           </div>
 
           <div class="control-group">
-            <label>Legenda / Texto na Tela</label>
+            <label>Fim do Corte (Trim Out) <span class="val-pill" id="trimEndLabel">0.0s</span></label>
+            <input type="range" id="trimEnd" min="0" max="10" step="0.1" value="10" oninput="updateTrim()" />
+          </div>
+
+          <div class="control-group">
+            <label>Velocidade <span class="val-pill" id="speedLabel">1.0x</span></label>
+            <input type="range" id="speedRange" min="0.5" max="2" step="0.25" value="1" oninput="updateSpeed()" />
+          </div>
+        </div>
+
+        <!-- PANE: TELA & PROPORÇÃO -->
+        <div class="tool-pane" id="pane-canvas">
+          <div class="control-group">
+            <label>Proporção do Canvas</label>
+            <div class="grid-options">
+              <button type="button" class="option-card selected" onclick="setAspectRatio(16, 9, this)">16:9 YouTube</button>
+              <button type="button" class="option-card" onclick="setAspectRatio(9, 16, this)">9:16 Reels/TikTok</button>
+              <button type="button" class="option-card" onclick="setAspectRatio(1, 1, this)">1:1 Quadrado</button>
+              <button type="button" class="option-card" onclick="setAspectRatio(4, 5, this)">4:5 Feed</button>
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Cor de Fundo (Bordas)</label>
+            <input type="color" id="bgColorPicker" value="#000000" style="width:100%; height:34px; border:none; background:none;" />
+          </div>
+        </div>
+
+        <!-- PANE: FILTROS -->
+        <div class="tool-pane" id="pane-filter">
+          <div class="control-group">
+            <label>Brilho <span class="val-pill" id="brightVal">100%</span></label>
+            <input type="range" id="filterBright" min="50" max="150" value="100" oninput="updateFilterLabels()" />
+          </div>
+          <div class="control-group">
+            <label>Contraste <span class="val-pill" id="contrastVal">100%</span></label>
+            <input type="range" id="filterContrast" min="50" max="150" value="100" oninput="updateFilterLabels()" />
+          </div>
+          <div class="control-group">
+            <label>Saturação <span class="val-pill" id="satVal">100%</span></label>
+            <input type="range" id="filterSat" min="0" max="200" value="100" oninput="updateFilterLabels()" />
+          </div>
+          <div class="control-group">
+            <label>Estilo Visual</label>
+            <select id="presetFilter">
+              <option value="none">Normal</option>
+              <option value="grayscale(100%)">Noir (P&amp;B)</option>
+              <option value="sepia(70%)">Cinema Vintage</option>
+              <option value="hue-rotate(180deg)">Invertido Sci-Fi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- PANE: TEXTO / LEGENDA -->
+        <div class="tool-pane" id="pane-text">
+          <div class="control-group">
+            <label>Legenda / Título na Tela</label>
             <input type="text" id="overlayText" placeholder="Digite uma fala ou título..." />
           </div>
           <div class="control-group">
-            <label>Tamanho da Fonte <span id="fontSizeLabel">32px</span></label>
+            <label>Tamanho da Fonte <span class="val-pill" id="fontSizeLabel">32px</span></label>
             <input type="range" id="fontSize" min="16" max="72" value="32" oninput="document.getElementById('fontSizeLabel').textContent = this.value + 'px'" />
           </div>
           <div class="control-group">
-            <label>Posição Vertical <span id="textYLabel">85%</span></label>
+            <label>Posição Vertical <span class="val-pill" id="textYLabel">85%</span></label>
             <input type="range" id="textY" min="10" max="95" value="85" oninput="document.getElementById('textYLabel').textContent = this.value + '%'" />
           </div>
           <div class="control-group">
@@ -734,69 +994,15 @@
             <input type="color" id="textColor" value="#ffffff" style="width:100%; height:34px; border:none; background:none;" />
           </div>
         </div>
-
-        <div class="tab-pane" id="tab-trim">
-          <div class="control-group">
-            <label>Início do Corte (Trim In) <span id="trimStartLabel">0.0s</span></label>
-            <input type="range" id="trimStart" min="0" max="10" step="0.1" value="0" oninput="updateTrim()" />
-          </div>
-
-          <div class="control-group">
-            <label>Fim do Corte (Trim Out) <span id="trimEndLabel">0.0s</span></label>
-            <input type="range" id="trimEnd" min="0" max="10" step="0.1" value="10" oninput="updateTrim()" />
-          </div>
-
-          <div class="control-group">
-            <label>Velocidade de Reprodução <span id="speedLabel">1.0x</span></label>
-            <input type="range" id="speedRange" min="0.5" max="2" step="0.25" value="1" oninput="updateSpeed()" />
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab-canvas">
-          <label style="font-size:12px; color:var(--text-muted);">Proporção do Vídeo</label>
-          <div class="grid-options">
-            <button class="option-card selected" onclick="setAspectRatio(16, 9, this)">16:9 YouTube</button>
-            <button class="option-card" onclick="setAspectRatio(9, 16, this)">9:16 Reels/TikTok</button>
-            <button class="option-card" onclick="setAspectRatio(1, 1, this)">1:1 Quadrado</button>
-            <button class="option-card" onclick="setAspectRatio(4, 5, this)">4:5 Feed</button>
-          </div>
-          <div class="control-group" style="margin-top:8px;">
-            <label>Cor de Fundo (Bordas)</label>
-            <input type="color" id="bgColorPicker" value="#000000" style="width:100%; height:36px; border:none; background:none;" />
-          </div>
-        </div>
-
-        <div class="tab-pane" id="tab-filter">
-          <div class="control-group">
-            <label>Brilho <span id="brightVal">100%</span></label>
-            <input type="range" id="filterBright" min="50" max="150" value="100" oninput="updateFilterLabels()" />
-          </div>
-          <div class="control-group">
-            <label>Contraste <span id="contrastVal">100%</span></label>
-            <input type="range" id="filterContrast" min="50" max="150" value="100" oninput="updateFilterLabels()" />
-          </div>
-          <div class="control-group">
-            <label>Saturação <span id="satVal">100%</span></label>
-            <input type="range" id="filterSat" min="0" max="200" value="100" oninput="updateFilterLabels()" />
-          </div>
-          <div class="control-group">
-            <label>Preto e Branco / Sépias</label>
-            <select id="presetFilter">
-              <option value="none">Normal</option>
-              <option value="grayscale(100%)">Noir (P&B)</option>
-              <option value="sepia(70%)">Cinema Vintage</option>
-              <option value="hue-rotate(180deg)">Invertido Sci-Fi</option>
-            </select>
-          </div>
-        </div>
       </div>
     </aside>
   </div>
 
+  <!-- Multitrack Timeline -->
   <section class="timeline-section">
     <div class="timeline-header">
       <span>LINHA DO TEMPO MULTITRILHA</span>
-      <span>Clique para mover a agulha • Arraste os takes azuis para ajustar o tempo</span>
+      <span>Clique para mover a agulha • Arraste os takes azuis para sincronizar</span>
     </div>
     <div class="tracks-container" id="tracksContainer" onclick="seekTimeline(event)">
       <div class="playhead" id="playhead"></div>
@@ -831,11 +1037,44 @@
     </div>
   </section>
 
+  <!-- InShot-Style Bottom Tool Dock -->
+  <nav class="inshot-dock" aria-label="Ferramentas do editor">
+    <button type="button" class="dock-btn active" data-tool="dub" onclick="selectDockTool('dub', this)">
+      <span class="dock-icon">🎙️</span>
+      <span>Dublar &amp; Voz</span>
+    </button>
+    <button type="button" class="dock-btn" data-tool="sfx" onclick="selectDockTool('sfx', this)">
+      <span class="dock-icon">💥</span>
+      <span>Lutas</span>
+    </button>
+    <button type="button" class="dock-btn" data-tool="amb" onclick="selectDockTool('amb', this)">
+      <span class="dock-icon">🌧️</span>
+      <span>Clima</span>
+    </button>
+    <button type="button" class="dock-btn" data-tool="trim" onclick="selectDockTool('trim', this)">
+      <span class="dock-icon">✂️</span>
+      <span>Corte</span>
+    </button>
+    <button type="button" class="dock-btn" data-tool="canvas" onclick="selectDockTool('canvas', this)">
+      <span class="dock-icon">📐</span>
+      <span>Tela</span>
+    </button>
+    <button type="button" class="dock-btn" data-tool="filter" onclick="selectDockTool('filter', this)">
+      <span class="dock-icon">🎨</span>
+      <span>Filtros</span>
+    </button>
+    <button type="button" class="dock-btn" data-tool="text" onclick="selectDockTool('text', this)">
+      <span class="dock-icon">🔤</span>
+      <span>Texto</span>
+    </button>
+  </nav>
+
+  <!-- Export Modal -->
   <div class="modal-overlay" id="exportModal">
     <div class="modal-box">
       <h3>Renderizando Vídeo Dublado...</h3>
       <p style="font-size: 12px; color: var(--text-muted);">
-        Gravando canvas e mixando áudio original, dublagem, lutas e ambientação.
+        Gravando canvas e mixando áudio original, dublagem com efeitos de voz, lutas e clima.
       </p>
       <div class="progress-bar">
         <div class="progress-fill" id="exportProgress"></div>
@@ -865,11 +1104,7 @@
     let ambFilterNode = null;
     let lastTriggeredSfxId = null;
 
-    // Cada take guarda:
-    // startTime: onde começa na linha do tempo do vídeo
-    // sourceTrimStart: onde começa dentro do áudio gravado
-    // duration: duração ativa do take
-    // rawDuration: duração total gravada do take
+    let activeVoicePreset = 'normal';
     let dubTakes = [];
     let selectedTakeId = null;
     let draggingTakeId = null;
@@ -879,6 +1114,61 @@
     let dubVolume = 1.0;
     let sfxVolume = 0.9;
     let ambVolume = 0.4;
+
+    const toolMeta = {
+      dub: { title: '🎙️ Dublagem & Efeitos de Voz' },
+      sfx: { title: '💥 Efeitos de Luta (SFX)' },
+      amb: { title: '🌧️ Ambientação & Clima' },
+      trim: { title: '✂️ Corte & Velocidade' },
+      canvas: { title: '📐 Proporção & Fundo' },
+      filter: { title: '🎨 Filtros & Cor' },
+      text: { title: '🔤 Legenda & Texto' }
+    };
+
+    const voiceLabels = {
+      normal: 'Normal',
+      echo: 'Eco',
+      deep: 'Voz Grave',
+      monster: 'Monstro',
+      demon: 'Demônio',
+      robot: 'Robô',
+      radio: 'Rádio',
+      cave: 'Caverna'
+    };
+
+    function selectDockTool(toolId, btn) {
+      const drawer = document.getElementById('inspectorDrawer');
+      const isAlreadyActive = btn && btn.classList.contains('active') && !drawer.classList.contains('collapsed');
+
+      document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tool-pane').forEach(p => p.classList.remove('active'));
+
+      if (isAlreadyActive) {
+        drawer.classList.add('collapsed');
+        return;
+      }
+
+      drawer.classList.remove('collapsed');
+      if (btn) btn.classList.add('active');
+      const pane = document.getElementById('pane-' + toolId);
+      if (pane) pane.classList.add('active');
+      if (toolMeta[toolId]) {
+        document.getElementById('inspectorTitle').textContent = toolMeta[toolId].title;
+      }
+    }
+
+    function toggleInspector() {
+      const drawer = document.getElementById('inspectorDrawer');
+      drawer.classList.toggle('collapsed');
+      if (drawer.classList.contains('collapsed')) {
+        document.querySelectorAll('.dock-btn').forEach(b => b.classList.remove('active'));
+      } else {
+        const activePane = document.querySelector('.tool-pane.active');
+        const id = activePane ? activePane.id.replace('pane-', '') : 'dub';
+        const dockBtn = document.querySelector(`.dock-btn[data-tool="${id}"]`);
+        if (dockBtn) dockBtn.classList.add('active');
+      }
+    }
 
     document.getElementById('videoInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
@@ -932,49 +1222,163 @@
       return previewAudioCtx;
     }
 
+    function makeDistortionCurve(amount) {
+      const k = typeof amount === 'number' ? amount : 50;
+      const nSamples = 44100;
+      const curve = new Float32Array(nSamples);
+      const deg = Math.PI / 180;
+      for (let i = 0; i < nSamples; ++i) {
+        const x = (i * 2) / nSamples - 1;
+        curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+      }
+      return curve;
+    }
+
     function applyVoicePresetToAudio(audioEl, preset) {
-      if (preset === 'villain') {
-        audioEl.playbackRate = 0.82;
-      } else if (preset === 'chipmunk') {
-        audioEl.playbackRate = 1.28;
+      const baseSpeed = video.playbackRate || 1.0;
+      if (preset === 'deep') {
+        audioEl.playbackRate = Math.max(0.5, 0.8 * baseSpeed);
+      } else if (preset === 'monster') {
+        audioEl.playbackRate = Math.max(0.5, 0.66 * baseSpeed);
+      } else if (preset === 'demon') {
+        audioEl.playbackRate = Math.max(0.5, 0.74 * baseSpeed);
       } else {
-        audioEl.playbackRate = video.playbackRate || 1.0;
+        audioEl.playbackRate = baseSpeed;
       }
     }
 
     function connectVoiceNodes(audioCtx, sourceNode, destination, preset) {
-      if (preset === 'radio') {
+      if (preset === 'echo') {
+        const delay = audioCtx.createDelay(1.0);
+        delay.delayTime.value = 0.22;
+        const fb = audioCtx.createGain();
+        fb.gain.value = 0.42;
+        const wet = audioCtx.createGain();
+        wet.gain.value = 0.55;
+        sourceNode.connect(destination);
+        sourceNode.connect(delay);
+        delay.connect(fb);
+        fb.connect(delay);
+        delay.connect(wet);
+        wet.connect(destination);
+      } else if (preset === 'deep') {
+        const lowShelf = audioCtx.createBiquadFilter();
+        lowShelf.type = 'lowshelf';
+        lowShelf.frequency.value = 240;
+        lowShelf.gain.value = 9;
+        const lp = audioCtx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 1150;
+        sourceNode.connect(lowShelf).connect(lp).connect(destination);
+      } else if (preset === 'monster') {
+        const sub = audioCtx.createOscillator();
+        sub.type = 'sawtooth';
+        sub.frequency.value = 46;
+        const subGain = audioCtx.createGain();
+        subGain.gain.value = 0.24;
+
+        const shaper = audioCtx.createWaveShaper();
+        shaper.curve = makeDistortionCurve(85);
+        shaper.oversample = '4x';
+
+        const lp = audioCtx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 820;
+
+        const delay = audioCtx.createDelay(0.6);
+        delay.delayTime.value = 0.12;
+        const fb = audioCtx.createGain();
+        fb.gain.value = 0.25;
+
+        sourceNode.connect(shaper).connect(lp);
+        sub.connect(subGain).connect(lp);
+        lp.connect(destination);
+        lp.connect(delay).connect(fb).connect(delay);
+        delay.connect(destination);
+        sub.start();
+      } else if (preset === 'demon') {
+        const shaper = audioCtx.createWaveShaper();
+        shaper.curve = makeDistortionCurve(140);
+        shaper.oversample = '4x';
+
+        const bp = audioCtx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = 480;
+        bp.Q.value = 1.4;
+
+        const delay = audioCtx.createDelay(0.8);
+        delay.delayTime.value = 0.18;
+        const fb = audioCtx.createGain();
+        fb.gain.value = 0.38;
+
+        sourceNode.connect(shaper).connect(bp).connect(destination);
+        bp.connect(delay).connect(fb).connect(delay);
+        delay.connect(destination);
+      } else if (preset === 'robot') {
+        const modOsc = audioCtx.createOscillator();
+        modOsc.type = 'square';
+        modOsc.frequency.value = 55;
+        const modGain = audioCtx.createGain();
+        modGain.gain.value = 0.5;
+
+        const ringTarget = audioCtx.createGain();
+        ringTarget.gain.value = 0.5;
+        modOsc.connect(modGain);
+        modGain.connect(ringTarget.gain);
+
+        const bp = audioCtx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.value = 1350;
+        bp.Q.value = 3.2;
+
+        sourceNode.connect(ringTarget).connect(bp).connect(destination);
+        modOsc.start();
+      } else if (preset === 'radio') {
         const hp = audioCtx.createBiquadFilter();
         hp.type = 'highpass';
-        hp.frequency.value = 500;
+        hp.frequency.value = 520;
         const lp = audioCtx.createBiquadFilter();
         lp.type = 'lowpass';
-        lp.frequency.value = 2800;
-        sourceNode.connect(hp).connect(lp).connect(destination);
+        lp.frequency.value = 2750;
+        const drive = audioCtx.createWaveShaper();
+        drive.curve = makeDistortionCurve(25);
+        sourceNode.connect(hp).connect(lp).connect(drive).connect(destination);
       } else if (preset === 'cave') {
-        const delay = audioCtx.createDelay();
-        delay.delayTime.value = 0.14;
-        const fb = audioCtx.createGain();
-        fb.gain.value = 0.35;
-        sourceNode.connect(destination);
-        sourceNode.connect(delay).connect(fb).connect(delay);
-        delay.connect(destination);
-      } else if (preset === 'villain') {
+        const delay1 = audioCtx.createDelay(1.0);
+        delay1.delayTime.value = 0.28;
+        const delay2 = audioCtx.createDelay(1.0);
+        delay2.delayTime.value = 0.44;
+        const fb1 = audioCtx.createGain();
+        fb1.gain.value = 0.45;
+        const fb2 = audioCtx.createGain();
+        fb2.gain.value = 0.32;
         const lp = audioCtx.createBiquadFilter();
         lp.type = 'lowpass';
-        lp.frequency.value = 950;
-        sourceNode.connect(lp).connect(destination);
+        lp.frequency.value = 1600;
+
+        sourceNode.connect(destination);
+        sourceNode.connect(delay1);
+        delay1.connect(fb1).connect(delay1);
+        delay1.connect(lp).connect(destination);
+
+        sourceNode.connect(delay2);
+        delay2.connect(fb2).connect(delay2);
+        delay2.connect(destination);
       } else {
         sourceNode.connect(destination);
       }
     }
 
-    function updateVoicePreset() {
-      const currentPreset = document.getElementById('voicePreset').value;
+    function selectVoicePreset(preset) {
+      activeVoicePreset = preset;
+      document.querySelectorAll('#voicePresetGrid .voice-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.preset === preset);
+      });
+
       const selected = dubTakes.find(t => t.id === selectedTakeId);
       if (selected) {
-        selected.preset = currentPreset;
-        applyVoicePresetToAudio(selected.audioEl, currentPreset);
+        selected.preset = preset;
+        applyVoicePresetToAudio(selected.audioEl, preset);
         renderDubList();
       }
     }
@@ -1143,13 +1547,6 @@
       syncAmbientPreview(isPlaying);
     }
 
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-' + tabId).classList.add('active');
-    }
-
     function togglePlay() {
       if (!video.src) return;
       if (isPlaying) {
@@ -1234,7 +1631,7 @@
         recordedChunks = [];
         mediaRecorder = new MediaRecorder(micStream);
         recordStartTime = video.currentTime;
-        const selectedPreset = document.getElementById('voicePreset').value;
+        const selectedPreset = activeVoicePreset;
 
         mediaRecorder.ondataavailable = (e) => {
           if (e.data.size > 0) recordedChunks.push(e.data);
@@ -1321,7 +1718,7 @@
       selectedTakeId = id;
       const take = dubTakes.find(t => t.id === id);
       if (take) {
-        document.getElementById('voicePreset').value = take.preset || 'normal';
+        selectVoicePreset(take.preset || 'normal');
       }
       renderDubList();
       renderTimelineClips();
@@ -1343,9 +1740,9 @@
 
       if (!take) {
         document.getElementById('selectedTakeTitle').textContent = 'Nenhum take selecionado';
-        document.getElementById('takeStartLabel').textContent = '0.0s';
-        document.getElementById('takeTrimStartLabel').textContent = '0.0s';
-        document.getElementById('takeDurationLabel').textContent = '0.0s';
+        document.getElementById('takeStartLabel').textContent = '0.00s';
+        document.getElementById('takeTrimStartLabel').textContent = '0.00s';
+        document.getElementById('takeDurationLabel').textContent = '0.00s';
         return;
       }
 
@@ -1468,10 +1865,25 @@
         pauseAll();
         video.currentTime = take.startTime;
       }
+      const ctxAudio = ensureAudioContext();
       take.audioEl.pause();
       take.audioEl.currentTime = take.sourceTrimStart;
       take.audioEl.volume = Math.min(1, dubVolume);
       applyVoicePresetToAudio(take.audioEl, take.preset || 'normal');
+      if (!take._previewConnected) {
+        const src = ctxAudio.createMediaElementSource(take.audioEl);
+        take._previewGain = ctxAudio.createGain();
+        take._previewGain.gain.value = 1;
+        take._previewPreset = null;
+        src.connect(take._previewGain).connect(ctxAudio.destination);
+        take._previewSource = src;
+        take._previewConnected = true;
+      }
+      if (take._previewPreset !== (take.preset || 'normal')) {
+        take._previewGain.disconnect();
+        connectVoiceNodes(ctxAudio, take._previewSource, ctxAudio.destination, take.preset || 'normal');
+        take._previewPreset = take.preset || 'normal';
+      }
       take.audioEl.play().catch(() => {});
       setTimeout(() => {
         if (!isPlaying) take.audioEl.pause();
@@ -1487,14 +1899,15 @@
         const div = document.createElement('div');
         div.className = 'dub-item' + (take.id === selectedTakeId ? ' selected' : '');
         div.onclick = () => selectTake(take.id);
+        const fxName = voiceLabels[take.preset] || take.preset || 'Normal';
         div.innerHTML = `
           <div class="dub-item-info">
-            <strong>${take.name} (${take.preset || 'normal'})</strong>
-            <span style="color:var(--text-muted)">Cena: ${take.startTime.toFixed(1)}s • Corte: ${take.sourceTrimStart.toFixed(1)}s • Dur: ${take.duration.toFixed(1)}s</span>
+            <strong>${take.name} • ${fxName}</strong>
+            <span>Cena: ${take.startTime.toFixed(1)}s • Corte: ${take.sourceTrimStart.toFixed(1)}s • Dur: ${take.duration.toFixed(1)}s</span>
           </div>
-          <div style="display:flex; gap:6px;" onclick="event.stopPropagation()">
-            <button onclick="jumpToTime(${take.startTime}); selectTake(${take.id})" title="Ir para take">▶️</button>
-            <button onclick="deleteDubTake(${take.id})" title="Excluir">🗑️</button>
+          <div style="display:flex; gap:5px; flex-shrink:0;" onclick="event.stopPropagation()">
+            <button type="button" onclick="jumpToTime(${take.startTime}); selectTake(${take.id})" title="Ir para take">▶️</button>
+            <button type="button" onclick="deleteDubTake(${take.id})" title="Excluir">🗑️</button>
           </div>
         `;
         list.appendChild(div);
@@ -1512,11 +1925,11 @@
         div.innerHTML = `
           <div class="dub-item-info">
             <strong>${ev.label}</strong>
-            <span style="color:var(--text-muted)">Tempo: ${ev.time.toFixed(1)}s</span>
+            <span>Tempo: ${ev.time.toFixed(1)}s</span>
           </div>
-          <div style="display:flex; gap:6px;">
-            <button onclick="jumpToTime(${ev.time})" title="Ir para efeito">▶️</button>
-            <button onclick="deleteSfxEvent(${ev.id})" title="Excluir">🗑️</button>
+          <div style="display:flex; gap:5px; flex-shrink:0;">
+            <button type="button" onclick="jumpToTime(${ev.time})" title="Ir para efeito">▶️</button>
+            <button type="button" onclick="deleteSfxEvent(${ev.id})" title="Excluir">🗑️</button>
           </div>
         `;
         list.appendChild(div);
@@ -1560,12 +1973,13 @@
       dubTakes.forEach(take => {
         const leftPct = Math.max(0, Math.min(98, (take.startTime / video.duration) * 100));
         const widthPct = Math.min(100 - leftPct, (take.duration / video.duration) * 100);
+        const fxName = voiceLabels[take.preset] || take.preset || 'Normal';
 
         const el = document.createElement('div');
         el.className = 'clip-block dub-clip' + (take.id === selectedTakeId ? ' selected' : '');
         el.style.left = leftPct + '%';
         el.style.width = Math.max(2.5, widthPct) + '%';
-        el.textContent = `${take.name} (${take.startTime.toFixed(1)}s)`;
+        el.textContent = `${take.name} [${fxName}] (${take.startTime.toFixed(1)}s)`;
 
         el.onmousedown = (e) => {
           e.stopPropagation();
@@ -1647,6 +2061,7 @@
       const spd = parseFloat(document.getElementById('speedRange').value);
       video.playbackRate = spd;
       document.getElementById('speedLabel').textContent = spd + 'x';
+      dubTakes.forEach(take => applyVoicePresetToAudio(take.audioEl, take.preset || 'normal'));
     }
 
     function setAspectRatio(w, h, btn) {
