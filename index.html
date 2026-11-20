@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WolfCut Studio - Editor de Vídeo & Dublagem</title>
+  <style>
+    :root {
+      --bg-dark: #0a0a0c;
+      --bg-panel: #141418;
+      --bg-card: #1e1e24;
+      --border: #2c2c35;
+      --accent: #e11d48;
+      --accent-hover: #be123c;
+      --silver: #d4d4d8;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --dub-color: #3b82f6;
+      --video-color: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Header */
+    header {
+      height: 54px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      color: var(--silver);
+    }
+
+    .brand span {
+      background: linear-gradient(135deg, #fff, #71717a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    button:hover {
+      background: #27272f;
+      border-color: #3f3f46;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: var(--accent-hover);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* Main Workspace */
+    .workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Preview Area */
+    .preview-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      position: relative;
+      background: radial-gradient(circle at center, #16161d 0%, #09090b 100%);
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+      border: 1px solid var(--border);
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100%;
+      max-height: calc(100% - 56px);
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 52vh;
+      object-fit: contain;
+    }
+
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(10, 10, 12, 0.9);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* Transport Controls */
+    .transport-bar {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg-panel);
+      padding: 6px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    .timecode {
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--silver);
+    }
+
+    /* Right Tool Panel */
+    .tool-panel {
+      width: 340px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tool-tabs {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border-bottom: 1px solid var(--border);
+      background: #101014;
+    }
+
+    .tab-btn {
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      flex-direction: column;
+      padding: 10px 4px;
+      font-size: 11px;
+      color: var(--text-muted);
+      gap: 4px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      background: var(--bg-panel);
+      border-bottom-color: var(--accent);
+    }
+
+    .tool-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tab-pane.active {
+      display: flex;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-group label {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    input[type="text"], select {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .grid-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .option-card {
+      justify-content: center;
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    .option-card.selected {
+      border-color: var(--accent);
+      background: rgba(225, 29, 72, 0.15);
+      color: #fff;
+    }
+
+    /* Dubbing Studio Specifics */
+    .record-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mic-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 4px solid rgba(225, 29, 72, 0.3);
+      color: white;
+      font-size: 22px;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .mic-btn.recording {
+      animation: pulse 1.2s infinite;
+      background: #ef4444;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    .vu-meter {
+      width: 100%;
+      height: 8px;
+      background: #09090b;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .vu-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+      transition: width 0.05s linear;
+    }
+
+    .dub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .dub-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .dub-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    /* Timeline Bottom Section */
+    .timeline-section {
+      height: 195px;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .timeline-header {
+      height: 32px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .tracks-container {
+      flex: 1;
+      position: relative;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .playhead {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 16px;
+      width: 2px;
+      background: #fff;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .playhead::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -5px;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid #fff;
+    }
+
+    .track-row {
+      height: 44px;
+      background: #101014;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .track-label {
+      position: sticky;
+      left: 0;
+      z-index: 10;
+      background: rgba(20, 20, 24, 0.92);
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--silver);
+      border-right: 1px solid var(--border);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      min-width: 82px;
+    }
+
+    .track-lane {
+      flex: 1;
+      height: 100%;
+      position: relative;
+    }
+
+    .clip-block {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .video-clip {
+      background: rgba(139, 92, 246, 0.35);
+      border: 1px solid var(--video-color);
+      color: #ede9fe;
+    }
+
+    .dub-clip {
+      background: rgba(59, 130, 246, 0.35);
+      border: 1px solid var(--dub-color);
+      color: #dbeafe;
+    }
+
+    /* Export Overlay */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .modal-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      padding: 24px;
+      border-radius: 12px;
+      width: 340px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-card);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      🎬 <span>WOLFCUT STUDIO — EDITOR & DUBLAGEM</span>
+    </div>
+    <div class="header-actions">
+      <input type="file" id="videoInput" accept="video/*" hidden />
+      <button onclick="document.getElementById('videoInput').click()">📁 Importar Vídeo</button>
+      <button class="primary" id="exportBtn" disabled onclick="exportVideo()">⬇️ Exportar Vídeo</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- Preview -->
+    <div class="preview-section">
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="previewCanvas" width="854" height="480"></canvas>
+        <div class="empty-state" id="emptyState">
+          <div style="font-size: 36px;">🎞️</div>
+          <h3>Nenhum vídeo carregado</h3>
+          <p>Importe uma cena para cortar, aplicar filtros e gravar sua dublagem sincronizada.</p>
+          <button class="primary" onclick="document.getElementById('videoInput').click()">Selecionar Vídeo</button>
+        </div>
+      </div>
+
+      <div class="transport-bar">
+        <button id="playPauseBtn" disabled onclick="togglePlay()">▶️ Play</button>
+        <span class="timecode" id="timeDisplay">00:00.0 / 00:00.0</span>
+        <button id="stopBtn" disabled onclick="stopPlayback()">⏹️ Início</button>
+      </div>
+    </div>
+
+    <!-- Right Tools -->
+    <aside class="tool-panel">
+      <div class="tool-tabs">
+        <button class="tab-btn active" onclick="switchTab('dub', this)">🎙️<span>Dublar</span></button>
+        <button class="tab-btn" onclick="switchTab('trim', this)">✂️<span>Corte</span></button>
+        <button class="tab-btn" onclick="switchTab('canvas', this)">📐<span>Tela</span></button>
+        <button class="tab-btn" onclick="switchTab('filter', this)">🎨<span>Filtros</span></button>
+        <button class="tab-btn" onclick="switchTab('text', this)">🔤<span>Texto</span></button>
+      </div>
+
+      <div class="tool-content">
+        <!-- TAB: DUBLAGEM -->
+        <div class="tab-pane active" id="tab-dub">
+          <div class="record-box">
+            <div style="font-size: 13px; font-weight: 600;" id="recStatus">Pronto para gravar voz</div>
+            <button class="mic-btn" id="recordBtn" disabled onclick="toggleRecording()">🎙️</button>
+            <div class="vu-meter"><div class="vu-fill" id="vuFill"></div></div>
+            <div style="font-size: 11px; color: var(--text-muted);">
+              O vídeo tocará automaticamente durante a gravação para sincronia labial.
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Volume Áudio Original <span id="origVolLabel">30%</span></label>
+            <input type="range" id="origVol" min="0" max="1" step="0.05" value="0.3" oninput="updateVolumes()" />
+          </div>
+
+          <div class="control-group">
+            <label>Volume da Dublagem <span id="dubVolLabel">100%</span></label>
+            <input type="range" id="dubVol" min="0" max="1.5" step="0.05" value="1" oninput="updateVolumes()" />
+          </div>
+
+          <div class="control-group">
+            <label>Takes Gravados (<span id="dubCount">0</span>)</label>
+            <div class="dub-list" id="dubList"></div>
+          </div>
+        </div>
+
+        <!-- TAB: CORTE & VELOCIDADE -->
+        <div class="tab-pane" id="tab-trim">
+          <div class="control-group">
+            <label>Início do Corte (Trim In) <span id="trimStartLabel">0.0s</span></label>
+            <input type="range" id="trimStart" min="0" max="10" step="0.1" value="0" oninput="updateTrim()" />
+          </div>
+
+          <div class="control-group">
+            <label>Fim do Corte (Trim Out) <span id="trimEndLabel">0.0s</span></label>
+            <input type="range" id="trimEnd" min="0" max="10" step="0.1" value="10" oninput="updateTrim()" />
+          </div>
+
+          <div class="control-group">
+            <label>Velocidade de Reprodução <span id="speedLabel">1.0x</span></label>
+            <input type="range" id="speedRange" min="0.5" max="2" step="0.25" value="1" oninput="updateSpeed()" />
+          </div>
+        </div>
+
+        <!-- TAB: PROPORÇÃO -->
+        <div class="tab-pane" id="tab-canvas">
+          <label style="font-size:12px; color:var(--text-muted);">Proporção do Vídeo</label>
+          <div class="grid-options">
+            <button class="option-card selected" onclick="setAspectRatio(16, 9, this)">16:9 YouTube</button>
+            <button class="option-card" onclick="setAspectRatio(9, 16, this)">9:16 Reels/TikTok</button>
+            <button class="option-card" onclick="setAspectRatio(1, 1, this)">1:1 Quadrado</button>
+            <button class="option-card" onclick="setAspectRatio(4, 5, this)">4:5 Feed</button>
+          </div>
+          <div class="control-group" style="margin-top:8px;">
+            <label>Cor de Fundo (Bordas)</label>
+            <input type="color" id="bgColorPicker" value="#000000" style="width:100%; height:36px; border:none; background:none;" />
+          </div>
+        </div>
+
+        <!-- TAB: FILTROS -->
+        <div class="tab-pane" id="tab-filter">
+          <div class="control-group">
+            <label>Brilho <span id="brightVal">100%</span></label>
+            <input type="range" id="filterBright" min="50" max="150" value="100" oninput="updateFilterLabels()" />
+          </div>
+          <div class="control-group">
+            <label>Contraste <span id="contrastVal">100%</span></label>
+            <input type="range" id="filterContrast" min="50" max="150" value="100" oninput="updateFilterLabels()" />
+          </div>
+          <div class="control-group">
+            <label>Saturação <span id="satVal">100%</span></label>
+            <input type="range" id="filterSat" min="0" max="200" value="100" oninput="updateFilterLabels()" />
+          </div>
+          <div class="control-group">
+            <label>Preto e Branco / Sépias</label>
+            <select id="presetFilter">
+              <option value="none">Normal</option>
+              <option value="grayscale(100%)">Noir (P&B)</option>
+              <option value="sepia(70%)">Cinema Vintage</option>
+              <option value="hue-rotate(180deg)">Invertido Sci-Fi</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- TAB: TEXTO / LEGENDA -->
+        <div class="tab-pane" id="tab-text">
+          <div class="control-group">
+            <label>Legenda / Título na Tela</label>
+            <input type="text" id="overlayText" placeholder="Digite uma fala ou título..." />
+          </div>
+          <div class="control-group">
+            <label>Tamanho da Fonte <span id="fontSizeLabel">32px</span></label>
+            <input type="range" id="fontSize" min="16" max="72" value="32" oninput="document.getElementById('fontSizeLabel').textContent = this.value + 'px'" />
+          </div>
+          <div class="control-group">
+            <label>Posição Vertical <span id="textYLabel">85%</span></label>
+            <input type="range" id="textY" min="10" max="95" value="85" oninput="document.getElementById('textYLabel').textContent = this.value + '%'" />
+          </div>
+          <div class="control-group">
+            <label>Cor do Texto</label>
+            <input type="color" id="textColor" value="#ffffff" style="width:100%; height:36px; border:none; background:none;" />
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Timeline -->
+  <section class="timeline-section">
+    <div class="timeline-header">
+      <span>LINHA DO TEMPO MULTITRILHA</span>
+      <span>Clique na timeline para mover a agulha</span>
+    </div>
+    <div class="tracks-container" id="tracksContainer" onclick="seekTimeline(event)">
+      <div class="playhead" id="playhead"></div>
+
+      <!-- Trilha de Dublagem -->
+      <div class="track-row">
+        <div class="track-label">🎙️ Dublagem</div>
+        <div class="track-lane" id="dubTrackLane"></div>
+      </div>
+
+      <!-- Trilha de Vídeo -->
+      <div class="track-row">
+        <div class="track-label">🎬 Vídeo</div>
+        <div class="track-lane" id="videoTrackLane">
+          <div class="clip-block video-clip" id="videoClipBlock" style="left: 0%; width: 100%; display: none;">
+            Clipe Principal
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal Export -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-box">
+      <h3>Renderizando Vídeo Dublado...</h3>
+      <p style="font-size: 12px; color: var(--text-muted);">
+        Gravando canvas e mixando áudio original + dublagem em tempo real. Aguarde concluir.
+      </p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="exportProgress"></div>
+      </div>
+      <span id="exportPercent" style="font-size: 12px;">0%</span>
+    </div>
+  </div>
+
+  <video id="sourceVideo" playsinline hidden></video>
+
+  <script>
+    const video = document.getElementById('sourceVideo');
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let isPlaying = false;
+    let isRecording = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let recordStartTime = 0;
+    let micStream = null;
+    let analyser = null;
+
+    // Lista de takes de dublagem: { id, startTime, duration, audioEl, url, name }
+    let dubTakes = [];
+    let trimStart = 0;
+    let trimEnd = 0;
+    let dubVolume = 1.0;
+
+    // Carregar vídeo
+    document.getElementById('videoInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const url = URL.createObjectURL(file);
+      video.src = url;
+      video.onloadedmetadata = () => {
+        trimStart = 0;
+        trimEnd = video.duration;
+
+        const tStartInput = document.getElementById('trimStart');
+        const tEndInput = document.getElementById('trimEnd');
+        tStartInput.max = video.duration;
+        tStartInput.value = 0;
+        tEndInput.max = video.duration;
+        tEndInput.value = video.duration;
+
+        updateTrimLabels();
+        video.volume = parseFloat(document.getElementById('origVol').value);
+        video.currentTime = 0;
+
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('playPauseBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = false;
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('exportBtn').disabled = false;
+
+        const clipBlock = document.getElementById('videoClipBlock');
+        clipBlock.style.display = 'flex';
+        clipBlock.textContent = file.name;
+
+        renderLoop();
+      };
+    });
+
+    // Alternar Abas
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    // Play / Pause
+    function togglePlay() {
+      if (!video.src) return;
+      if (isPlaying) {
+        pauseAll();
+      } else {
+        if (video.currentTime >= trimEnd || video.currentTime < trimStart) {
+          video.currentTime = trimStart;
+        }
+        video.play();
+        isPlaying = true;
+        document.getElementById('playPauseBtn').textContent = '⏸️ Pause';
+        syncDubTakes(true);
+      }
+    }
+
+    function pauseAll() {
+      video.pause();
+      isPlaying = false;
+      document.getElementById('playPauseBtn').textContent = '▶️ Play';
+      dubTakes.forEach(t => t.audioEl.pause());
+    }
+
+    function stopPlayback() {
+      pauseAll();
+      video.currentTime = trimStart;
+      syncDubTakes(false);
+    }
+
+    // Sincronizar Takes de Dublagem com a agulha do vídeo
+    function syncDubTakes(shouldPlay) {
+      const now = video.currentTime;
+      dubTakes.forEach(take => {
+        take.audioEl.volume = Math.min(1, dubVolume);
+        take.audioEl.playbackRate = video.playbackRate;
+        const end = take.startTime + take.duration;
+
+        if (now >= take.startTime && now < end) {
+          const offset = now - take.startTime;
+          if (Math.abs(take.audioEl.currentTime - offset) > 0.18) {
+            take.audioEl.currentTime = offset;
+          }
+          if (shouldPlay && take.audioEl.paused && !isRecording) {
+            take.audioEl.play().catch(() => {});
+          }
+        } else {
+          take.audioEl.pause();
+        }
+      });
+    }
+
+    // Gravação de Dublagem
+    async function toggleRecording() {
+      if (isRecording) {
+        stopRecording();
+        return;
+      }
+
+      try {
+        if (!micStream) {
+          micStream = await navigator.mediaDevices.getUserMedia({
+            audio: { echoCancellation: true, noiseSuppression: true }
+          });
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const source = audioCtx.createMediaStreamSource(micStream);
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 256;
+          source.connect(analyser);
+          updateVuMeter();
+        }
+
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(micStream);
+        recordStartTime = video.currentTime;
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) recordedChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+          const url = URL.createObjectURL(blob);
+          const audioEl = new Audio(url);
+          const duration = Math.max(0.2, video.currentTime - recordStartTime);
+
+          const take = {
+            id: Date.now(),
+            name: `Take #${dubTakes.length + 1}`,
+            startTime: recordStartTime,
+            duration: duration,
+            audioEl: audioEl,
+            url: url
+          };
+
+          dubTakes.push(take);
+          renderDubList();
+          renderTimelineClips();
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+
+        const recBtn = document.getElementById('recordBtn');
+        recBtn.classList.add('recording');
+        recBtn.textContent = '⏹️';
+        document.getElementById('recStatus').textContent = '🔴 Gravando dublagem...';
+
+        // Inicia o vídeo automaticamente
+        video.play();
+        isPlaying = true;
+        document.getElementById('playPauseBtn').textContent = '⏸️ Pause';
+
+      } catch (err) {
+        alert('Permissão de microfone negada ou indisponível: ' + err.message);
+      }
+    }
+
+    function stopRecording() {
+      if (!isRecording) return;
+      isRecording = false;
+      mediaRecorder.stop();
+      pauseAll();
+
+      const recBtn = document.getElementById('recordBtn');
+      recBtn.classList.remove('recording');
+      recBtn.textContent = '🎙️';
+      document.getElementById('recStatus').textContent = 'Take salvo na timeline!';
+      document.getElementById('vuFill').style.width = '0%';
+    }
+
+    function updateVuMeter() {
+      if (!analyser) return;
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      function tick() {
+        if (isRecording) {
+          analyser.getByteFrequencyData(data);
+          const avg = data.reduce((a, b) => a + b, 0) / data.length;
+          document.getElementById('vuFill').style.width = Math.min(100, avg * 2.2) + '%';
+        }
+        requestAnimationFrame(tick);
+      }
+      tick();
+    }
+
+    function renderDubList() {
+      const list = document.getElementById('dubList');
+      document.getElementById('dubCount').textContent = dubTakes.length;
+      list.innerHTML = '';
+
+      dubTakes.forEach(take => {
+        const div = document.createElement('div');
+        div.className = 'dub-item';
+        div.innerHTML = `
+          <div class="dub-item-info">
+            <strong>${take.name}</strong>
+            <span style="color:var(--text-muted)">Início: ${take.startTime.toFixed(1)}s (${take.duration.toFixed(1)}s)</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button onclick="jumpToTime(${take.startTime})" title="Ir para take">▶️</button>
+            <button onclick="deleteDubTake(${take.id})" title="Excluir">🗑️</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function jumpToTime(t) {
+      video.currentTime = t;
+      syncDubTakes(isPlaying);
+    }
+
+    function deleteDubTake(id) {
+      const idx = dubTakes.findIndex(t => t.id === id);
+      if (idx > -1) {
+        dubTakes[idx].audioEl.pause();
+        dubTakes.splice(idx, 1);
+        renderDubList();
+        renderTimelineClips();
+      }
+    }
+
+    function renderTimelineClips() {
+      const lane = document.getElementById('dubTrackLane');
+      lane.innerHTML = '';
+      if (!video.duration) return;
+
+      dubTakes.forEach(take => {
+        const leftPct = (take.startTime / video.duration) * 100;
+        const widthPct = Math.min(100 - leftPct, (take.duration / video.duration) * 100);
+
+        const el = document.createElement('div');
+        el.className = 'clip-block dub-clip';
+        el.style.left = leftPct + '%';
+        el.style.width = Math.max(1.5, widthPct) + '%';
+        el.textContent = take.name;
+        lane.appendChild(el);
+      });
+    }
+
+    // Volumes, Trim, Velocidade, Proporção e Filtros
+    function updateVolumes() {
+      const orig = parseFloat(document.getElementById('origVol').value);
+      dubVolume = parseFloat(document.getElementById('dubVol').value);
+      video.volume = orig;
+      document.getElementById('origVolLabel').textContent = Math.round(orig * 100) + '%';
+      document.getElementById('dubVolLabel').textContent = Math.round(dubVolume * 100) + '%';
+    }
+
+    function updateTrim() {
+      trimStart = parseFloat(document.getElementById('trimStart').value);
+      trimEnd = parseFloat(document.getElementById('trimEnd').value);
+      if (trimStart >= trimEnd) trimStart = Math.max(0, trimEnd - 0.2);
+      updateTrimLabels();
+
+      const block = document.getElementById('videoClipBlock');
+      block.style.left = (trimStart / video.duration) * 100 + '%';
+      block.style.width = ((trimEnd - trimStart) / video.duration) * 100 + '%';
+    }
+
+    function updateTrimLabels() {
+      document.getElementById('trimStartLabel').textContent = trimStart.toFixed(1) + 's';
+      document.getElementById('trimEndLabel').textContent = trimEnd.toFixed(1) + 's';
+    }
+
+    function updateSpeed() {
+      const spd = parseFloat(document.getElementById('speedRange').value);
+      video.playbackRate = spd;
+      document.getElementById('speedLabel').textContent = spd + 'x';
+    }
+
+    function setAspectRatio(w, h, btn) {
+      document.querySelectorAll('.option-card').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+
+      const base = 720;
+      if (w >= h) {
+        canvas.width = base;
+        canvas.height = Math.round((base * h) / w);
+      } else {
+        canvas.height = base;
+        canvas.width = Math.round((base * w) / h);
+      }
+    }
+
+    function updateFilterLabels() {
+      document.getElementById('brightVal').textContent = document.getElementById('filterBright').value + '%';
+      document.getElementById('contrastVal').textContent = document.getElementById('filterContrast').value + '%';
+      document.getElementById('satVal').textContent = document.getElementById('filterSat').value + '%';
+    }
+
+    function seekTimeline(e) {
+      if (!video.duration) return;
+      const container = document.getElementById('tracksContainer');
+      const rect = container.getBoundingClientRect();
+      const labelWidth = 82;
+      const clickX = e.clientX - rect.left - labelWidth - 16;
+      const laneWidth = rect.width - labelWidth - 32;
+      const ratio = Math.max(0, Math.min(1, clickX / laneWidth));
+
+      video.currentTime = ratio * video.duration;
+      syncDubTakes(isPlaying);
+    }
+
+    function formatTime(sec) {
+      if (isNaN(sec)) return '00:00.0';
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toFixed(1).padStart(4, '0');
+      return `${m}:${s}`;
+    }
+
+    // Loop principal de renderização
+    function renderLoop() {
+      if (video.src) {
+        // Verifica fim do corte
+        if (isPlaying && video.currentTime >= trimEnd) {
+          if (isRecording) stopRecording();
+          else pauseAll();
+        }
+
+        if (isPlaying) syncDubTakes(true);
+
+        // Fundo
+        ctx.fillStyle = document.getElementById('bgColorPicker').value;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Filtros
+        const b = document.getElementById('filterBright').value;
+        const c = document.getElementById('filterContrast').value;
+        const s = document.getElementById('filterSat').value;
+        const preset = document.getElementById('presetFilter').value;
+        ctx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%) ${preset !== 'none' ? preset : ''}`;
+
+        // Ajuste proporcional (Letterbox / Fit)
+        if (video.videoWidth && video.videoHeight) {
+          const scale = Math.min(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
+          const drawW = video.videoWidth * scale;
+          const drawH = video.videoHeight * scale;
+          const dx = (canvas.width - drawW) / 2;
+          const dy = (canvas.height - drawH) / 2;
+          ctx.drawImage(video, dx, dy, drawW, drawH);
+        }
+
+        ctx.filter = 'none';
+
+        // Texto / Legenda
+        const text = document.getElementById('overlayText').value;
+        if (text.trim()) {
+          const fontSize = document.getElementById('fontSize').value;
+          const textY = (document.getElementById('textY').value / 100) * canvas.height;
+          ctx.font = `bold ${fontSize}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.lineWidth = Math.max(3, fontSize / 10);
+          ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+          ctx.strokeText(text, canvas.width / 2, textY);
+          ctx.fillStyle = document.getElementById('textColor').value;
+          ctx.fillText(text, canvas.width / 2, textY);
+        }
+
+        // Atualiza UI e Playhead
+        document.getElementById('timeDisplay').textContent =
+          `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+
+        const laneWidth = document.getElementById('videoTrackLane').offsetWidth;
+        const pct = video.duration ? (video.currentTime / video.duration) : 0;
+        document.getElementById('playhead').style.left = (16 + 82 + pct * laneWidth) + 'px';
+      }
+
+      requestAnimationFrame(renderLoop);
+    }
+
+    // Exportar Vídeo com Áudio Original + Dublagem Mixados
+    async function exportVideo() {
+      pauseAll();
+      const modal = document.getElementById('exportModal');
+      modal.style.display = 'flex';
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const dest = audioCtx.createMediaStreamDestination();
+
+      // Conecta áudio do vídeo original
+      const videoSource = audioCtx.createMediaElementSource(video);
+      const videoGain = audioCtx.createGain();
+      videoGain.gain.value = parseFloat(document.getElementById('origVol').value);
+      videoSource.connect(videoGain).connect(dest);
+      videoGain.connect(audioCtx.destination);
+
+      // Conecta todos os takes de dublagem
+      const exportDubAudios = dubTakes.map(take => {
+        const a = new Audio(take.url);
+        const src = audioCtx.createMediaElementSource(a);
+        const g = audioCtx.createGain();
+        g.gain.value = dubVolume;
+        src.connect(g).connect(dest);
+        g.connect(audioCtx.destination);
+        return { audio: a, startTime: take.startTime, duration: take.duration };
+      });
+
+      const canvasStream = canvas.captureStream(30);
+      const combinedStream = new MediaStream([
+        ...canvasStream.getVideoTracks(),
+        ...dest.stream.getAudioTracks()
+      ]);
+
+      const recorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm' });
+      const chunks = [];
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'video-dublado-wolfcut.webm';
+        a.click();
+        modal.style.display = 'none';
+      };
+
+      video.currentTime = trimStart;
+      recorder.start();
+      video.play();
+
+      const totalDuration = trimEnd - trimStart;
+      const checkInterval = setInterval(() => {
+        const elapsed = video.currentTime - trimStart;
+        const pct = Math.min(100, Math.round((elapsed / totalDuration) * 100));
+        document.getElementById('exportProgress').style.width = pct + '%';
+        document.getElementById('exportPercent').textContent = pct + '%';
+
+        exportDubAudios.forEach(item => {
+          if (video.currentTime >= item.startTime && video.currentTime < item.startTime + item.duration) {
+            if (item.audio.paused) {
+              item.audio.currentTime = video.currentTime - item.startTime;
+              item.audio.play().catch(() => {});
+            }
+          } else {
+            item.audio.pause();
+          }
+        });
+
+        if (video.currentTime >= trimEnd || video.ended) {
+          clearInterval(checkInterval);
+          video.pause();
+          exportDubAudios.forEach(i => i.audio.pause());
+          recorder.stop();
+        }
+      }, 60);
+    }
+  </script>
+</body>
+</html>
