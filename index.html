@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WolfCut Studio - Editor de Vídeo & Dublagem</title>
+  <title>WolfCut Studio - Editor de Vídeo, Dublagem & SFX</title>
   <style>
     :root {
       --bg-dark: #0a0a0c;
@@ -16,6 +16,8 @@
       --text-main: #f4f4f5;
       --text-muted: #a1a1aa;
       --dub-color: #3b82f6;
+      --sfx-color: #f59e0b;
+      --amb-color: #10b981;
       --video-color: #8b5cf6;
     }
 
@@ -36,7 +38,6 @@
       user-select: none;
     }
 
-    /* Header */
     header {
       height: 54px;
       background: var(--bg-panel);
@@ -84,7 +85,7 @@
       transition: all 0.15s ease;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       background: #27272f;
       border-color: #3f3f46;
     }
@@ -95,7 +96,7 @@
       color: #fff;
     }
 
-    button.primary:hover {
+    button.primary:hover:not(:disabled) {
       background: var(--accent-hover);
     }
 
@@ -104,14 +105,12 @@
       cursor: not-allowed;
     }
 
-    /* Main Workspace */
     .workspace {
       flex: 1;
       display: flex;
       overflow: hidden;
     }
 
-    /* Preview Area */
     .preview-section {
       flex: 1;
       display: flex;
@@ -139,7 +138,7 @@
     canvas {
       display: block;
       max-width: 100%;
-      max-height: 52vh;
+      max-height: 48vh;
       object-fit: contain;
     }
 
@@ -161,7 +160,6 @@
       font-size: 14px;
     }
 
-    /* Transport Controls */
     .transport-bar {
       margin-top: 12px;
       display: flex;
@@ -179,9 +177,8 @@
       color: var(--silver);
     }
 
-    /* Right Tool Panel */
     .tool-panel {
-      width: 340px;
+      width: 375px;
       background: var(--bg-panel);
       border-left: 1px solid var(--border);
       display: flex;
@@ -190,7 +187,7 @@
 
     .tool-tabs {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       border-bottom: 1px solid var(--border);
       background: #101014;
     }
@@ -200,10 +197,10 @@
       border-radius: 0;
       background: transparent;
       flex-direction: column;
-      padding: 10px 4px;
-      font-size: 11px;
+      padding: 9px 2px;
+      font-size: 10px;
       color: var(--text-muted);
-      gap: 4px;
+      gap: 3px;
       border-bottom: 2px solid transparent;
     }
 
@@ -215,17 +212,17 @@
 
     .tool-content {
       flex: 1;
-      padding: 16px;
+      padding: 14px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .tab-pane {
       display: none;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .tab-pane.active {
@@ -269,7 +266,7 @@
 
     .option-card {
       justify-content: center;
-      padding: 10px;
+      padding: 9px 8px;
       font-size: 12px;
     }
 
@@ -279,27 +276,26 @@
       color: #fff;
     }
 
-    /* Dubbing Studio Specifics */
     .record-box {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 16px;
+      padding: 12px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .mic-btn {
-      width: 64px;
-      height: 64px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       background: var(--accent);
       border: 4px solid rgba(225, 29, 72, 0.3);
       color: white;
-      font-size: 22px;
+      font-size: 20px;
       justify-content: center;
       transition: transform 0.2s;
     }
@@ -333,18 +329,26 @@
     .dub-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+      max-height: 135px;
+      overflow-y: auto;
     }
 
     .dub-item {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      padding: 8px 10px;
+      padding: 7px 10px;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 12px;
+      cursor: pointer;
+    }
+
+    .dub-item.selected {
+      border-color: var(--dub-color);
+      background: rgba(59, 130, 246, 0.14);
     }
 
     .dub-item-info {
@@ -353,9 +357,49 @@
       gap: 2px;
     }
 
-    /* Timeline Bottom Section */
+    .take-editor-box {
+      background: var(--bg-card);
+      border: 1px solid #353542;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nudge-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .nudge-btn {
+      padding: 6px 4px;
+      font-size: 11px;
+      justify-content: center;
+    }
+
+    .sfx-pad {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .sfx-btn {
+      padding: 10px 8px;
+      font-size: 12px;
+      justify-content: center;
+      background: #1a1a22;
+      border-color: #343440;
+    }
+
+    .sfx-btn:hover:not(:disabled) {
+      border-color: var(--sfx-color);
+      background: rgba(245, 158, 11, 0.12);
+    }
+
     .timeline-section {
-      height: 195px;
+      height: 235px;
       background: var(--bg-panel);
       border-top: 1px solid var(--border);
       display: flex;
@@ -363,13 +407,13 @@
     }
 
     .timeline-header {
-      height: 32px;
+      height: 30px;
       padding: 0 16px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
     }
 
@@ -377,11 +421,11 @@
       flex: 1;
       position: relative;
       overflow-x: auto;
-      overflow-y: hidden;
-      padding: 12px 16px;
+      overflow-y: auto;
+      padding: 10px 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       cursor: pointer;
     }
 
@@ -389,7 +433,7 @@
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 16px;
+      left: 114px;
       width: 2px;
       background: #fff;
       z-index: 20;
@@ -407,20 +451,21 @@
     }
 
     .track-row {
-      height: 44px;
+      height: 38px;
       background: #101014;
       border: 1px solid var(--border);
       border-radius: 6px;
       position: relative;
       display: flex;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .track-label {
       position: sticky;
       left: 0;
       z-index: 10;
-      background: rgba(20, 20, 24, 0.92);
+      background: rgba(20, 20, 24, 0.95);
       padding: 4px 8px;
       font-size: 11px;
       font-weight: 600;
@@ -429,7 +474,7 @@
       height: 100%;
       display: flex;
       align-items: center;
-      min-width: 82px;
+      min-width: 98px;
     }
 
     .track-lane {
@@ -443,8 +488,8 @@
       top: 4px;
       bottom: 4px;
       border-radius: 4px;
-      font-size: 11px;
-      padding: 0 8px;
+      font-size: 10px;
+      padding: 0 6px;
       display: flex;
       align-items: center;
       overflow: hidden;
@@ -462,9 +507,26 @@
       background: rgba(59, 130, 246, 0.35);
       border: 1px solid var(--dub-color);
       color: #dbeafe;
+      cursor: grab;
     }
 
-    /* Export Overlay */
+    .dub-clip.selected {
+      outline: 2px solid #fff;
+      z-index: 5;
+    }
+
+    .sfx-clip {
+      background: rgba(245, 158, 11, 0.35);
+      border: 1px solid var(--sfx-color);
+      color: #fef3c7;
+    }
+
+    .amb-clip {
+      background: rgba(16, 185, 129, 0.3);
+      border: 1px solid var(--amb-color);
+      color: #d1fae5;
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -506,7 +568,7 @@
 
   <header>
     <div class="brand">
-      🎬 <span>WOLFCUT STUDIO — EDITOR & DUBLAGEM</span>
+      🎬 <span>WOLFCUT STUDIO — DUBLAGEM, VOZ & SFX</span>
     </div>
     <div class="header-actions">
       <input type="file" id="videoInput" accept="video/*" hidden />
@@ -516,14 +578,13 @@
   </header>
 
   <div class="workspace">
-    <!-- Preview -->
     <div class="preview-section">
       <div class="canvas-wrapper" id="canvasWrapper">
         <canvas id="previewCanvas" width="854" height="480"></canvas>
         <div class="empty-state" id="emptyState">
           <div style="font-size: 36px;">🎞️</div>
           <h3>Nenhum vídeo carregado</h3>
-          <p>Importe uma cena para cortar, aplicar filtros e gravar sua dublagem sincronizada.</p>
+          <p>Importe uma cena para cortar, dublar com alterador de voz, inserir lutas e ambientação.</p>
           <button class="primary" onclick="document.getElementById('videoInput').click()">Selecionar Vídeo</button>
         </div>
       </div>
@@ -535,18 +596,17 @@
       </div>
     </div>
 
-    <!-- Right Tools -->
     <aside class="tool-panel">
       <div class="tool-tabs">
         <button class="tab-btn active" onclick="switchTab('dub', this)">🎙️<span>Dublar</span></button>
+        <button class="tab-btn" onclick="switchTab('sfx', this)">💥<span>Lutas</span></button>
+        <button class="tab-btn" onclick="switchTab('amb', this)">🌧️<span>Clima</span></button>
         <button class="tab-btn" onclick="switchTab('trim', this)">✂️<span>Corte</span></button>
         <button class="tab-btn" onclick="switchTab('canvas', this)">📐<span>Tela</span></button>
         <button class="tab-btn" onclick="switchTab('filter', this)">🎨<span>Filtros</span></button>
-        <button class="tab-btn" onclick="switchTab('text', this)">🔤<span>Texto</span></button>
       </div>
 
       <div class="tool-content">
-        <!-- TAB: DUBLAGEM -->
         <div class="tab-pane active" id="tab-dub">
           <div class="record-box">
             <div style="font-size: 13px; font-weight: 600;" id="recStatus">Pronto para gravar voz</div>
@@ -554,6 +614,56 @@
             <div class="vu-meter"><div class="vu-fill" id="vuFill"></div></div>
             <div style="font-size: 11px; color: var(--text-muted);">
               O vídeo tocará automaticamente durante a gravação para sincronia labial.
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Alterador de Voz (Novo Take)</label>
+            <select id="voicePreset" onchange="updateVoicePreset()">
+              <option value="normal">Normal (Sem alteração)</option>
+              <option value="villain">Grave / Vilão (Pitch Baixo)</option>
+              <option value="chipmunk">Agudo / Personagem Rápido</option>
+              <option value="radio">Rádio / Comunicador Tático</option>
+              <option value="cave">Eco / Caverna / Portal</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Takes Gravados (<span id="dubCount">0</span>)</label>
+            <div class="dub-list" id="dubList"></div>
+          </div>
+
+          <div class="take-editor-box" id="takeEditorBox">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:12px;" id="selectedTakeTitle">Nenhum take selecionado</strong>
+              <button id="previewTakeBtn" disabled onclick="previewSelectedTake()" style="padding:4px 8px; font-size:11px;">🔊 Ouvir</button>
+            </div>
+
+            <div class="control-group">
+              <label>Posição na Cena (Início) <span id="takeStartLabel">0.0s</span></label>
+              <input type="range" id="takeStartRange" min="0" max="10" step="0.05" value="0" disabled oninput="updateSelectedTakeStart(this.value)" />
+            </div>
+
+            <div class="nudge-row">
+              <button class="nudge-btn" id="nudgeMinus5" disabled onclick="nudgeSelectedTake(-0.5)">-0.5s</button>
+              <button class="nudge-btn" id="nudgeMinus1" disabled onclick="nudgeSelectedTake(-0.1)">-0.1s</button>
+              <button class="nudge-btn" id="nudgePlus1" disabled onclick="nudgeSelectedTake(0.1)">+0.1s</button>
+              <button class="nudge-btn" id="nudgePlus5" disabled onclick="nudgeSelectedTake(0.5)">+0.5s</button>
+            </div>
+
+            <div class="control-group">
+              <label>Corte Inicial do Áudio (Trim In) <span id="takeTrimStartLabel">0.0s</span></label>
+              <input type="range" id="takeTrimStartRange" min="0" max="5" step="0.05" value="0" disabled oninput="updateSelectedTakeTrimStart(this.value)" />
+            </div>
+
+            <div class="control-group">
+              <label>Duração / Corte Final do Take <span id="takeDurationLabel">0.0s</span></label>
+              <input type="range" id="takeDurationRange" min="0.2" max="10" step="0.05" value="1" disabled oninput="updateSelectedTakeDuration(this.value)" />
+            </div>
+
+            <div class="grid-options">
+              <button class="nudge-btn" id="snapPlayheadBtn" disabled onclick="snapTakeToPlayhead()">📍 Mover p/ Agulha</button>
+              <button class="nudge-btn" id="cutAtPlayheadBtn" disabled onclick="cutTakeAtPlayhead()">✂️ Cortar na Agulha</button>
             </div>
           </div>
 
@@ -566,14 +676,65 @@
             <label>Volume da Dublagem <span id="dubVolLabel">100%</span></label>
             <input type="range" id="dubVol" min="0" max="1.5" step="0.05" value="1" oninput="updateVolumes()" />
           </div>
+        </div>
+
+        <div class="tab-pane" id="tab-sfx">
+          <p style="font-size: 12px; color: var(--text-muted);">
+            Clique em um efeito para disparar na posição atual da agulha e adicionar na trilha de lutas.
+          </p>
+          <div class="sfx-pad">
+            <button class="sfx-btn" onclick="triggerFightSfx('punch')">👊 Soco / Impacto</button>
+            <button class="sfx-btn" onclick="triggerFightSfx('whoosh')">⚡ Chicote / Golpe</button>
+            <button class="sfx-btn" onclick="triggerFightSfx('explosion')">💣 Explosão</button>
+            <button class="sfx-btn" onclick="triggerFightSfx('laser')">🔫 Laser / Energia</button>
+          </div>
 
           <div class="control-group">
-            <label>Takes Gravados (<span id="dubCount">0</span>)</label>
-            <div class="dub-list" id="dubList"></div>
+            <label>Volume Efeitos de Luta <span id="sfxVolLabel">90%</span></label>
+            <input type="range" id="sfxVol" min="0" max="1.5" step="0.05" value="0.9" oninput="updateVolumes()" />
+          </div>
+
+          <div class="control-group">
+            <label>Efeitos Inseridos (<span id="sfxCount">0</span>)</label>
+            <div class="dub-list" id="sfxList"></div>
           </div>
         </div>
 
-        <!-- TAB: CORTE & VELOCIDADE -->
+        <div class="tab-pane" id="tab-amb">
+          <div class="control-group">
+            <label>Ambientação Contínua</label>
+            <select id="ambientPreset" onchange="updateAmbientPreset()">
+              <option value="none">Nenhuma (Silêncio)</option>
+              <option value="rain">🌧️ Chuva & Tempestade</option>
+              <option value="wind">🌌 Vento / Espaço Profundo</option>
+              <option value="city">🏙️ Cidade / Movimento Urbano</option>
+              <option value="room">🏠 Sala / Atmosfera Interna</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Volume da Ambientação <span id="ambVolLabel">40%</span></label>
+            <input type="range" id="ambVol" min="0" max="1" step="0.05" value="0.4" oninput="updateVolumes()" />
+          </div>
+
+          <div class="control-group">
+            <label>Legenda / Texto na Tela</label>
+            <input type="text" id="overlayText" placeholder="Digite uma fala ou título..." />
+          </div>
+          <div class="control-group">
+            <label>Tamanho da Fonte <span id="fontSizeLabel">32px</span></label>
+            <input type="range" id="fontSize" min="16" max="72" value="32" oninput="document.getElementById('fontSizeLabel').textContent = this.value + 'px'" />
+          </div>
+          <div class="control-group">
+            <label>Posição Vertical <span id="textYLabel">85%</span></label>
+            <input type="range" id="textY" min="10" max="95" value="85" oninput="document.getElementById('textYLabel').textContent = this.value + '%'" />
+          </div>
+          <div class="control-group">
+            <label>Cor do Texto</label>
+            <input type="color" id="textColor" value="#ffffff" style="width:100%; height:34px; border:none; background:none;" />
+          </div>
+        </div>
+
         <div class="tab-pane" id="tab-trim">
           <div class="control-group">
             <label>Início do Corte (Trim In) <span id="trimStartLabel">0.0s</span></label>
@@ -591,7 +752,6 @@
           </div>
         </div>
 
-        <!-- TAB: PROPORÇÃO -->
         <div class="tab-pane" id="tab-canvas">
           <label style="font-size:12px; color:var(--text-muted);">Proporção do Vídeo</label>
           <div class="grid-options">
@@ -606,7 +766,6 @@
           </div>
         </div>
 
-        <!-- TAB: FILTROS -->
         <div class="tab-pane" id="tab-filter">
           <div class="control-group">
             <label>Brilho <span id="brightVal">100%</span></label>
@@ -630,46 +789,37 @@
             </select>
           </div>
         </div>
-
-        <!-- TAB: TEXTO / LEGENDA -->
-        <div class="tab-pane" id="tab-text">
-          <div class="control-group">
-            <label>Legenda / Título na Tela</label>
-            <input type="text" id="overlayText" placeholder="Digite uma fala ou título..." />
-          </div>
-          <div class="control-group">
-            <label>Tamanho da Fonte <span id="fontSizeLabel">32px</span></label>
-            <input type="range" id="fontSize" min="16" max="72" value="32" oninput="document.getElementById('fontSizeLabel').textContent = this.value + 'px'" />
-          </div>
-          <div class="control-group">
-            <label>Posição Vertical <span id="textYLabel">85%</span></label>
-            <input type="range" id="textY" min="10" max="95" value="85" oninput="document.getElementById('textYLabel').textContent = this.value + '%'" />
-          </div>
-          <div class="control-group">
-            <label>Cor do Texto</label>
-            <input type="color" id="textColor" value="#ffffff" style="width:100%; height:36px; border:none; background:none;" />
-          </div>
-        </div>
       </div>
     </aside>
   </div>
 
-  <!-- Timeline -->
   <section class="timeline-section">
     <div class="timeline-header">
       <span>LINHA DO TEMPO MULTITRILHA</span>
-      <span>Clique na timeline para mover a agulha</span>
+      <span>Clique para mover a agulha • Arraste os takes azuis para ajustar o tempo</span>
     </div>
     <div class="tracks-container" id="tracksContainer" onclick="seekTimeline(event)">
       <div class="playhead" id="playhead"></div>
 
-      <!-- Trilha de Dublagem -->
       <div class="track-row">
         <div class="track-label">🎙️ Dublagem</div>
         <div class="track-lane" id="dubTrackLane"></div>
       </div>
 
-      <!-- Trilha de Vídeo -->
+      <div class="track-row">
+        <div class="track-label">💥 Lutas (SFX)</div>
+        <div class="track-lane" id="sfxTrackLane"></div>
+      </div>
+
+      <div class="track-row">
+        <div class="track-label">🌧️ Clima</div>
+        <div class="track-lane" id="ambTrackLane">
+          <div class="clip-block amb-clip" id="ambClipBlock" style="left: 0%; width: 100%; display: none;">
+            Sem ambientação
+          </div>
+        </div>
+      </div>
+
       <div class="track-row">
         <div class="track-label">🎬 Vídeo</div>
         <div class="track-lane" id="videoTrackLane">
@@ -681,12 +831,11 @@
     </div>
   </section>
 
-  <!-- Modal Export -->
   <div class="modal-overlay" id="exportModal">
     <div class="modal-box">
       <h3>Renderizando Vídeo Dublado...</h3>
       <p style="font-size: 12px; color: var(--text-muted);">
-        Gravando canvas e mixando áudio original + dublagem em tempo real. Aguarde concluir.
+        Gravando canvas e mixando áudio original, dublagem, lutas e ambientação.
       </p>
       <div class="progress-bar">
         <div class="progress-fill" id="exportProgress"></div>
@@ -710,13 +859,27 @@
     let micStream = null;
     let analyser = null;
 
-    // Lista de takes de dublagem: { id, startTime, duration, audioEl, url, name }
+    let previewAudioCtx = null;
+    let ambGainNode = null;
+    let ambSourceNode = null;
+    let ambFilterNode = null;
+    let lastTriggeredSfxId = null;
+
+    // Cada take guarda:
+    // startTime: onde começa na linha do tempo do vídeo
+    // sourceTrimStart: onde começa dentro do áudio gravado
+    // duration: duração ativa do take
+    // rawDuration: duração total gravada do take
     let dubTakes = [];
+    let selectedTakeId = null;
+    let draggingTakeId = null;
+    let sfxEvents = [];
     let trimStart = 0;
     let trimEnd = 0;
     let dubVolume = 1.0;
+    let sfxVolume = 0.9;
+    let ambVolume = 0.4;
 
-    // Carregar vídeo
     document.getElementById('videoInput').addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -734,6 +897,8 @@
         tEndInput.max = video.duration;
         tEndInput.value = video.duration;
 
+        document.getElementById('takeStartRange').max = video.duration;
+
         updateTrimLabels();
         video.volume = parseFloat(document.getElementById('origVol').value);
         video.currentTime = 0;
@@ -748,11 +913,236 @@
         clipBlock.style.display = 'flex';
         clipBlock.textContent = file.name;
 
+        const ambBlock = document.getElementById('ambClipBlock');
+        ambBlock.style.display = 'flex';
+
+        renderTimelineClips();
+        renderSfxTimeline();
         renderLoop();
       };
     });
 
-    // Alternar Abas
+    function ensureAudioContext() {
+      if (!previewAudioCtx) {
+        previewAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (previewAudioCtx.state === 'suspended') {
+        previewAudioCtx.resume();
+      }
+      return previewAudioCtx;
+    }
+
+    function applyVoicePresetToAudio(audioEl, preset) {
+      if (preset === 'villain') {
+        audioEl.playbackRate = 0.82;
+      } else if (preset === 'chipmunk') {
+        audioEl.playbackRate = 1.28;
+      } else {
+        audioEl.playbackRate = video.playbackRate || 1.0;
+      }
+    }
+
+    function connectVoiceNodes(audioCtx, sourceNode, destination, preset) {
+      if (preset === 'radio') {
+        const hp = audioCtx.createBiquadFilter();
+        hp.type = 'highpass';
+        hp.frequency.value = 500;
+        const lp = audioCtx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 2800;
+        sourceNode.connect(hp).connect(lp).connect(destination);
+      } else if (preset === 'cave') {
+        const delay = audioCtx.createDelay();
+        delay.delayTime.value = 0.14;
+        const fb = audioCtx.createGain();
+        fb.gain.value = 0.35;
+        sourceNode.connect(destination);
+        sourceNode.connect(delay).connect(fb).connect(delay);
+        delay.connect(destination);
+      } else if (preset === 'villain') {
+        const lp = audioCtx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 950;
+        sourceNode.connect(lp).connect(destination);
+      } else {
+        sourceNode.connect(destination);
+      }
+    }
+
+    function updateVoicePreset() {
+      const currentPreset = document.getElementById('voicePreset').value;
+      const selected = dubTakes.find(t => t.id === selectedTakeId);
+      if (selected) {
+        selected.preset = currentPreset;
+        applyVoicePresetToAudio(selected.audioEl, currentPreset);
+        renderDubList();
+      }
+    }
+
+    function playFightSfxOnContext(audioCtx, dest, type, vol) {
+      const now = audioCtx.currentTime;
+      const masterGain = audioCtx.createGain();
+      masterGain.gain.value = Math.min(1.5, vol);
+      masterGain.connect(dest);
+
+      if (type === 'punch') {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(165, now);
+        osc.frequency.exponentialRampToValueAtTime(38, now + 0.18);
+        g.gain.setValueAtTime(1, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(g).connect(masterGain);
+        osc.start(now);
+        osc.stop(now + 0.21);
+      } else if (type === 'whoosh') {
+        const bufferSize = Math.floor(audioCtx.sampleRate * 0.25);
+        const buf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buf;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(350, now);
+        filter.frequency.exponentialRampToValueAtTime(1800, now + 0.22);
+        noise.connect(filter).connect(masterGain);
+        noise.start(now);
+      } else if (type === 'explosion') {
+        const bufferSize = Math.floor(audioCtx.sampleRate * 0.65);
+        const buf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 1.6);
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buf;
+        const lp = audioCtx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(520, now);
+        lp.frequency.exponentialRampToValueAtTime(75, now + 0.6);
+        noise.connect(lp).connect(masterGain);
+        noise.start(now);
+      } else if (type === 'laser') {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(920, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.22);
+        g.gain.setValueAtTime(0.6, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
+        osc.connect(g).connect(masterGain);
+        osc.start(now);
+        osc.stop(now + 0.24);
+      }
+    }
+
+    function triggerFightSfx(type) {
+      const ctxAudio = ensureAudioContext();
+      playFightSfxOnContext(ctxAudio, ctxAudio.destination, type, sfxVolume);
+
+      const labels = {
+        punch: '👊 Soco',
+        whoosh: '⚡ Golpe',
+        explosion: '💣 Explosão',
+        laser: '🔫 Laser'
+      };
+      const durations = { punch: 0.22, whoosh: 0.25, explosion: 0.65, laser: 0.24 };
+
+      const eventItem = {
+        id: Date.now() + Math.random(),
+        time: video.src ? video.currentTime : 0,
+        type,
+        label: labels[type] || type,
+        duration: durations[type] || 0.25
+      };
+
+      lastTriggeredSfxId = eventItem.id;
+      sfxEvents.push(eventItem);
+      renderSfxList();
+      renderSfxTimeline();
+    }
+
+    function startAmbientLoop(audioCtx, dest, preset, gainVal) {
+      if (preset === 'none') return null;
+      const bufferSize = audioCtx.sampleRate * 2;
+      const buf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buf.getChannelData(0);
+      let lastOut = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        data[i] = (lastOut + 0.04 * white) / 1.04;
+        lastOut = data[i];
+        data[i] *= 2.8;
+      }
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+
+      const filter = audioCtx.createBiquadFilter();
+      if (preset === 'rain') {
+        filter.type = 'bandpass';
+        filter.frequency.value = 1100;
+        filter.Q.value = 0.7;
+      } else if (preset === 'wind') {
+        filter.type = 'bandpass';
+        filter.frequency.value = 420;
+        filter.Q.value = 2.4;
+      } else if (preset === 'city') {
+        filter.type = 'lowpass';
+        filter.frequency.value = 650;
+      } else {
+        filter.type = 'lowpass';
+        filter.frequency.value = 240;
+      }
+
+      const gain = audioCtx.createGain();
+      gain.gain.value = gainVal;
+
+      src.connect(filter).connect(gain).connect(dest);
+      src.start();
+      return { src, gain, filter };
+    }
+
+    function stopPreviewAmbient() {
+      if (ambSourceNode) {
+        try { ambSourceNode.src.stop(); } catch (_) {}
+        ambSourceNode = null;
+        ambGainNode = null;
+        ambFilterNode = null;
+      }
+    }
+
+    function syncAmbientPreview(shouldPlay) {
+      const preset = document.getElementById('ambientPreset').value;
+      const block = document.getElementById('ambClipBlock');
+      if (block && block.style.display !== 'none') {
+        block.textContent = preset === 'none' ? 'Sem ambientação' : document.getElementById('ambientPreset').selectedOptions[0].text;
+      }
+
+      if (!shouldPlay || preset === 'none') {
+        stopPreviewAmbient();
+        return;
+      }
+
+      const ctxAudio = ensureAudioContext();
+      if (!ambSourceNode) {
+        const created = startAmbientLoop(ctxAudio, ctxAudio.destination, preset, ambVolume);
+        if (created) {
+          ambSourceNode = created.src;
+          ambGainNode = created.gain;
+          ambFilterNode = created.filter;
+        }
+      } else if (ambGainNode) {
+        ambGainNode.gain.value = ambVolume;
+      }
+    }
+
+    function updateAmbientPreset() {
+      stopPreviewAmbient();
+      syncAmbientPreview(isPlaying);
+    }
+
     function switchTab(tabId, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -760,7 +1150,6 @@
       document.getElementById('tab-' + tabId).classList.add('active');
     }
 
-    // Play / Pause
     function togglePlay() {
       if (!video.src) return;
       if (isPlaying) {
@@ -773,6 +1162,7 @@
         isPlaying = true;
         document.getElementById('playPauseBtn').textContent = '⏸️ Pause';
         syncDubTakes(true);
+        syncAmbientPreview(true);
       }
     }
 
@@ -781,26 +1171,27 @@
       isPlaying = false;
       document.getElementById('playPauseBtn').textContent = '▶️ Play';
       dubTakes.forEach(t => t.audioEl.pause());
+      stopPreviewAmbient();
     }
 
     function stopPlayback() {
       pauseAll();
+      lastTriggeredSfxId = null;
       video.currentTime = trimStart;
       syncDubTakes(false);
     }
 
-    // Sincronizar Takes de Dublagem com a agulha do vídeo
     function syncDubTakes(shouldPlay) {
       const now = video.currentTime;
       dubTakes.forEach(take => {
         take.audioEl.volume = Math.min(1, dubVolume);
-        take.audioEl.playbackRate = video.playbackRate;
+        applyVoicePresetToAudio(take.audioEl, take.preset || 'normal');
         const end = take.startTime + take.duration;
 
         if (now >= take.startTime && now < end) {
-          const offset = now - take.startTime;
-          if (Math.abs(take.audioEl.currentTime - offset) > 0.18) {
-            take.audioEl.currentTime = offset;
+          const targetAudioTime = Math.max(0, take.sourceTrimStart + (now - take.startTime));
+          if (Math.abs(take.audioEl.currentTime - targetAudioTime) > 0.16) {
+            take.audioEl.currentTime = targetAudioTime;
           }
           if (shouldPlay && take.audioEl.paused && !isRecording) {
             take.audioEl.play().catch(() => {});
@@ -809,9 +1200,18 @@
           take.audioEl.pause();
         }
       });
+
+      if (shouldPlay) {
+        sfxEvents.forEach(ev => {
+          if (Math.abs(now - ev.time) < 0.09 && lastTriggeredSfxId !== ev.id) {
+            lastTriggeredSfxId = ev.id;
+            const ctxAudio = ensureAudioContext();
+            playFightSfxOnContext(ctxAudio, ctxAudio.destination, ev.type, sfxVolume);
+          }
+        });
+      }
     }
 
-    // Gravação de Dublagem
     async function toggleRecording() {
       if (isRecording) {
         stopRecording();
@@ -823,9 +1223,9 @@
           micStream = await navigator.mediaDevices.getUserMedia({
             audio: { echoCancellation: true, noiseSuppression: true }
           });
-          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          const source = audioCtx.createMediaStreamSource(micStream);
-          analyser = audioCtx.createAnalyser();
+          const ctxAudio = ensureAudioContext();
+          const source = ctxAudio.createMediaStreamSource(micStream);
+          analyser = ctxAudio.createAnalyser();
           analyser.fftSize = 256;
           source.connect(analyser);
           updateVuMeter();
@@ -834,6 +1234,7 @@
         recordedChunks = [];
         mediaRecorder = new MediaRecorder(micStream);
         recordStartTime = video.currentTime;
+        const selectedPreset = document.getElementById('voicePreset').value;
 
         mediaRecorder.ondataavailable = (e) => {
           if (e.data.size > 0) recordedChunks.push(e.data);
@@ -849,14 +1250,26 @@
             id: Date.now(),
             name: `Take #${dubTakes.length + 1}`,
             startTime: recordStartTime,
+            sourceTrimStart: 0,
             duration: duration,
+            rawDuration: duration,
             audioEl: audioEl,
-            url: url
+            url: url,
+            preset: selectedPreset
+          };
+
+          audioEl.onloadedmetadata = () => {
+            if (isFinite(audioEl.duration) && audioEl.duration > 0) {
+              take.rawDuration = audioEl.duration;
+              if (take.id === selectedTakeId) syncTakeEditorUI(take);
+            }
           };
 
           dubTakes.push(take);
+          selectedTakeId = take.id;
           renderDubList();
           renderTimelineClips();
+          syncTakeEditorUI(take);
         };
 
         mediaRecorder.start();
@@ -867,10 +1280,10 @@
         recBtn.textContent = '⏹️';
         document.getElementById('recStatus').textContent = '🔴 Gravando dublagem...';
 
-        // Inicia o vídeo automaticamente
         video.play();
         isPlaying = true;
         document.getElementById('playPauseBtn').textContent = '⏸️ Pause';
+        syncAmbientPreview(true);
 
       } catch (err) {
         alert('Permissão de microfone negada ou indisponível: ' + err.message);
@@ -904,6 +1317,167 @@
       tick();
     }
 
+    function selectTake(id) {
+      selectedTakeId = id;
+      const take = dubTakes.find(t => t.id === id);
+      if (take) {
+        document.getElementById('voicePreset').value = take.preset || 'normal';
+      }
+      renderDubList();
+      renderTimelineClips();
+      syncTakeEditorUI(take || null);
+    }
+
+    function syncTakeEditorUI(take) {
+      const disabled = !take;
+      document.getElementById('previewTakeBtn').disabled = disabled;
+      document.getElementById('takeStartRange').disabled = disabled;
+      document.getElementById('takeTrimStartRange').disabled = disabled;
+      document.getElementById('takeDurationRange').disabled = disabled;
+      document.getElementById('nudgeMinus5').disabled = disabled;
+      document.getElementById('nudgeMinus1').disabled = disabled;
+      document.getElementById('nudgePlus1').disabled = disabled;
+      document.getElementById('nudgePlus5').disabled = disabled;
+      document.getElementById('snapPlayheadBtn').disabled = disabled;
+      document.getElementById('cutAtPlayheadBtn').disabled = disabled;
+
+      if (!take) {
+        document.getElementById('selectedTakeTitle').textContent = 'Nenhum take selecionado';
+        document.getElementById('takeStartLabel').textContent = '0.0s';
+        document.getElementById('takeTrimStartLabel').textContent = '0.0s';
+        document.getElementById('takeDurationLabel').textContent = '0.0s';
+        return;
+      }
+
+      const maxSceneTime = Math.max(1, video.duration || 10);
+      const maxAudioLen = Math.max(take.rawDuration || take.duration + take.sourceTrimStart, take.duration + take.sourceTrimStart, 0.5);
+
+      const startSlider = document.getElementById('takeStartRange');
+      startSlider.max = maxSceneTime;
+      startSlider.value = Math.min(maxSceneTime, take.startTime);
+
+      const trimStartSlider = document.getElementById('takeTrimStartRange');
+      trimStartSlider.max = Math.max(0.1, maxAudioLen - 0.15);
+      trimStartSlider.value = Math.min(parseFloat(trimStartSlider.max), take.sourceTrimStart);
+
+      const durSlider = document.getElementById('takeDurationRange');
+      durSlider.max = Math.max(0.5, maxAudioLen);
+      durSlider.value = Math.min(parseFloat(durSlider.max), take.duration);
+
+      document.getElementById('selectedTakeTitle').textContent = `Editando: ${take.name}`;
+      document.getElementById('takeStartLabel').textContent = take.startTime.toFixed(2) + 's';
+      document.getElementById('takeTrimStartLabel').textContent = take.sourceTrimStart.toFixed(2) + 's';
+      document.getElementById('takeDurationLabel').textContent = take.duration.toFixed(2) + 's';
+    }
+
+    function updateSelectedTakeStart(val) {
+      const take = dubTakes.find(t => t.id === selectedTakeId);
+      if (!take) return;
+      take.startTime = Math.max(0, parseFloat(val));
+      syncTakeEditorUI(take);
+      renderDubList();
+      renderTimelineClips();
+      syncDubTakes(isPlaying);
+    }
+
+    function nudgeSelectedTake(delta) {
+      const take = dubTakes.find(t => t.id === selectedTakeId);
+      if (!take) return;
+      const maxT = video.duration || 9999;
+      take.startTime = Math.max(0, Math.min(maxT, take.startTime + delta));
+      syncTakeEditorUI(take);
+      renderDubList();
+      renderTimelineClips();
+      syncDubTakes(isPlaying);
+    }
+
+    function updateSelectedTakeTrimStart(val) {
+      const take = dubTakes.find(t => t.id === selectedTakeId);
+      if (!take) return;
+      const maxAudioLen = Math.max(take.rawDuration || 0, take.sourceTrimStart + take.duration);
+      const nextTrimStart = Math.max(0, Math.min(maxAudioLen - 0.15, parseFloat(val)));
+      const diff = nextTrimStart - take.sourceTrimStart;
+      take.sourceTrimStart = nextTrimStart;
+      take.duration = Math.max(0.15, take.duration - diff);
+      syncTakeEditorUI(take);
+      renderDubList();
+      renderTimelineClips();
+      syncDubTakes(isPlaying);
+    }
+
+    function updateSelectedTakeDuration(val) {
+      const take = dubTakes.find(t => t.id === selectedTakeId);
+      if (!take) return;
+      take.duration = Math.max(0.15, parseFloat(val));
+      syncTakeEditorUI(take);
+      renderDubList();
+      renderTimelineClips();
+      syncDubTakes(isPlaying);
+    }
+
+    function snapTakeToPlayhead() {
+      const take = dubTakes.find(t => t.id === selectedTakeId);
+      if (!take || !video.src) return;
+      take.startTime = video.currentTime;
+      syncTakeEditorUI(take);
+      renderDubList();
+      renderTimelineClips();
+      syncDubTakes(isPlaying);
+    }
+
+    function cutTakeAtPlayhead() {
+      const take = dubTakes.find(t => t.id === selectedTakeId);
+      if (!take || !video.src) return;
+      const now = video.currentTime;
+      const takeEnd = take.startTime + take.duration;
+
+      if (now <= take.startTime + 0.08 || now >= takeEnd - 0.08) {
+        alert('Posicione a agulha dentro do take para dividir o corte.');
+        return;
+      }
+
+      const firstPartDuration = now - take.startTime;
+      const secondPartDuration = takeEnd - now;
+      const secondPartTrimStart = take.sourceTrimStart + firstPartDuration;
+
+      take.duration = firstPartDuration;
+
+      const splitTake = {
+        id: Date.now() + Math.random(),
+        name: `${take.name} (Corte)`,
+        startTime: now,
+        sourceTrimStart: secondPartTrimStart,
+        duration: secondPartDuration,
+        rawDuration: take.rawDuration,
+        audioEl: new Audio(take.url),
+        url: take.url,
+        preset: take.preset || 'normal'
+      };
+
+      dubTakes.push(splitTake);
+      selectedTakeId = splitTake.id;
+      renderDubList();
+      renderTimelineClips();
+      syncTakeEditorUI(splitTake);
+    }
+
+    function previewSelectedTake() {
+      const take = dubTakes.find(t => t.id === selectedTakeId);
+      if (!take) return;
+      if (video.src) {
+        pauseAll();
+        video.currentTime = take.startTime;
+      }
+      take.audioEl.pause();
+      take.audioEl.currentTime = take.sourceTrimStart;
+      take.audioEl.volume = Math.min(1, dubVolume);
+      applyVoicePresetToAudio(take.audioEl, take.preset || 'normal');
+      take.audioEl.play().catch(() => {});
+      setTimeout(() => {
+        if (!isPlaying) take.audioEl.pause();
+      }, (take.duration / (take.audioEl.playbackRate || 1)) * 1000);
+    }
+
     function renderDubList() {
       const list = document.getElementById('dubList');
       document.getElementById('dubCount').textContent = dubTakes.length;
@@ -911,14 +1485,15 @@
 
       dubTakes.forEach(take => {
         const div = document.createElement('div');
-        div.className = 'dub-item';
+        div.className = 'dub-item' + (take.id === selectedTakeId ? ' selected' : '');
+        div.onclick = () => selectTake(take.id);
         div.innerHTML = `
           <div class="dub-item-info">
-            <strong>${take.name}</strong>
-            <span style="color:var(--text-muted)">Início: ${take.startTime.toFixed(1)}s (${take.duration.toFixed(1)}s)</span>
+            <strong>${take.name} (${take.preset || 'normal'})</strong>
+            <span style="color:var(--text-muted)">Cena: ${take.startTime.toFixed(1)}s • Corte: ${take.sourceTrimStart.toFixed(1)}s • Dur: ${take.duration.toFixed(1)}s</span>
           </div>
-          <div style="display:flex; gap:6px;">
-            <button onclick="jumpToTime(${take.startTime})" title="Ir para take">▶️</button>
+          <div style="display:flex; gap:6px;" onclick="event.stopPropagation()">
+            <button onclick="jumpToTime(${take.startTime}); selectTake(${take.id})" title="Ir para take">▶️</button>
             <button onclick="deleteDubTake(${take.id})" title="Excluir">🗑️</button>
           </div>
         `;
@@ -926,7 +1501,30 @@
       });
     }
 
+    function renderSfxList() {
+      const list = document.getElementById('sfxList');
+      document.getElementById('sfxCount').textContent = sfxEvents.length;
+      list.innerHTML = '';
+
+      sfxEvents.forEach(ev => {
+        const div = document.createElement('div');
+        div.className = 'dub-item';
+        div.innerHTML = `
+          <div class="dub-item-info">
+            <strong>${ev.label}</strong>
+            <span style="color:var(--text-muted)">Tempo: ${ev.time.toFixed(1)}s</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button onclick="jumpToTime(${ev.time})" title="Ir para efeito">▶️</button>
+            <button onclick="deleteSfxEvent(${ev.id})" title="Excluir">🗑️</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
     function jumpToTime(t) {
+      lastTriggeredSfxId = null;
       video.currentTime = t;
       syncDubTakes(isPlaying);
     }
@@ -936,8 +1534,21 @@
       if (idx > -1) {
         dubTakes[idx].audioEl.pause();
         dubTakes.splice(idx, 1);
+        if (selectedTakeId === id) {
+          selectedTakeId = dubTakes.length ? dubTakes[0].id : null;
+        }
         renderDubList();
         renderTimelineClips();
+        syncTakeEditorUI(dubTakes.find(t => t.id === selectedTakeId) || null);
+      }
+    }
+
+    function deleteSfxEvent(id) {
+      const idx = sfxEvents.findIndex(e => e.id === id);
+      if (idx > -1) {
+        sfxEvents.splice(idx, 1);
+        renderSfxList();
+        renderSfxTimeline();
       }
     }
 
@@ -947,25 +1558,73 @@
       if (!video.duration) return;
 
       dubTakes.forEach(take => {
-        const leftPct = (take.startTime / video.duration) * 100;
+        const leftPct = Math.max(0, Math.min(98, (take.startTime / video.duration) * 100));
         const widthPct = Math.min(100 - leftPct, (take.duration / video.duration) * 100);
 
         const el = document.createElement('div');
-        el.className = 'clip-block dub-clip';
+        el.className = 'clip-block dub-clip' + (take.id === selectedTakeId ? ' selected' : '');
         el.style.left = leftPct + '%';
-        el.style.width = Math.max(1.5, widthPct) + '%';
-        el.textContent = take.name;
+        el.style.width = Math.max(2.5, widthPct) + '%';
+        el.textContent = `${take.name} (${take.startTime.toFixed(1)}s)`;
+
+        el.onmousedown = (e) => {
+          e.stopPropagation();
+          draggingTakeId = take.id;
+          selectTake(take.id);
+        };
+
         lane.appendChild(el);
       });
     }
 
-    // Volumes, Trim, Velocidade, Proporção e Filtros
+    window.addEventListener('mousemove', (e) => {
+      if (!draggingTakeId || !video.duration) return;
+      const take = dubTakes.find(t => t.id === draggingTakeId);
+      if (!take) return;
+      const lane = document.getElementById('dubTrackLane');
+      const rect = lane.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      take.startTime = parseFloat((ratio * video.duration).toFixed(2));
+      renderTimelineClips();
+      renderDubList();
+      if (take.id === selectedTakeId) syncTakeEditorUI(take);
+    });
+
+    window.addEventListener('mouseup', () => {
+      draggingTakeId = null;
+    });
+
+    function renderSfxTimeline() {
+      const lane = document.getElementById('sfxTrackLane');
+      lane.innerHTML = '';
+      if (!video.duration) return;
+
+      sfxEvents.forEach(ev => {
+        const leftPct = (ev.time / video.duration) * 100;
+        const widthPct = Math.max(2.5, (ev.duration / video.duration) * 100);
+
+        const el = document.createElement('div');
+        el.className = 'clip-block sfx-clip';
+        el.style.left = leftPct + '%';
+        el.style.width = Math.min(100 - leftPct, widthPct) + '%';
+        el.textContent = ev.label;
+        lane.appendChild(el);
+      });
+    }
+
     function updateVolumes() {
       const orig = parseFloat(document.getElementById('origVol').value);
       dubVolume = parseFloat(document.getElementById('dubVol').value);
+      sfxVolume = parseFloat(document.getElementById('sfxVol').value);
+      ambVolume = parseFloat(document.getElementById('ambVol').value);
+
       video.volume = orig;
+      if (ambGainNode) ambGainNode.gain.value = ambVolume;
+
       document.getElementById('origVolLabel').textContent = Math.round(orig * 100) + '%';
       document.getElementById('dubVolLabel').textContent = Math.round(dubVolume * 100) + '%';
+      document.getElementById('sfxVolLabel').textContent = Math.round(sfxVolume * 100) + '%';
+      document.getElementById('ambVolLabel').textContent = Math.round(ambVolume * 100) + '%';
     }
 
     function updateTrim() {
@@ -1011,14 +1670,12 @@
     }
 
     function seekTimeline(e) {
-      if (!video.duration) return;
-      const container = document.getElementById('tracksContainer');
-      const rect = container.getBoundingClientRect();
-      const labelWidth = 82;
-      const clickX = e.clientX - rect.left - labelWidth - 16;
-      const laneWidth = rect.width - labelWidth - 32;
-      const ratio = Math.max(0, Math.min(1, clickX / laneWidth));
+      if (!video.duration || draggingTakeId) return;
+      const lane = document.getElementById('videoTrackLane');
+      const rect = lane.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
 
+      lastTriggeredSfxId = null;
       video.currentTime = ratio * video.duration;
       syncDubTakes(isPlaying);
     }
@@ -1030,10 +1687,8 @@
       return `${m}:${s}`;
     }
 
-    // Loop principal de renderização
     function renderLoop() {
       if (video.src) {
-        // Verifica fim do corte
         if (isPlaying && video.currentTime >= trimEnd) {
           if (isRecording) stopRecording();
           else pauseAll();
@@ -1041,18 +1696,15 @@
 
         if (isPlaying) syncDubTakes(true);
 
-        // Fundo
         ctx.fillStyle = document.getElementById('bgColorPicker').value;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Filtros
         const b = document.getElementById('filterBright').value;
         const c = document.getElementById('filterContrast').value;
         const s = document.getElementById('filterSat').value;
         const preset = document.getElementById('presetFilter').value;
         ctx.filter = `brightness(${b}%) contrast(${c}%) saturate(${s}%) ${preset !== 'none' ? preset : ''}`;
 
-        // Ajuste proporcional (Letterbox / Fit)
         if (video.videoWidth && video.videoHeight) {
           const scale = Math.min(canvas.width / video.videoWidth, canvas.height / video.videoHeight);
           const drawW = video.videoWidth * scale;
@@ -1064,7 +1716,6 @@
 
         ctx.filter = 'none';
 
-        // Texto / Legenda
         const text = document.getElementById('overlayText').value;
         if (text.trim()) {
           const fontSize = document.getElementById('fontSize').value;
@@ -1078,19 +1729,21 @@
           ctx.fillText(text, canvas.width / 2, textY);
         }
 
-        // Atualiza UI e Playhead
         document.getElementById('timeDisplay').textContent =
           `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
 
-        const laneWidth = document.getElementById('videoTrackLane').offsetWidth;
-        const pct = video.duration ? (video.currentTime / video.duration) : 0;
-        document.getElementById('playhead').style.left = (16 + 82 + pct * laneWidth) + 'px';
+        const laneEl = document.getElementById('videoTrackLane');
+        const containerEl = document.getElementById('tracksContainer');
+        if (laneEl && containerEl && video.duration) {
+          const pct = video.currentTime / video.duration;
+          const headX = laneEl.offsetLeft + pct * laneEl.offsetWidth - containerEl.scrollLeft;
+          document.getElementById('playhead').style.left = headX + 'px';
+        }
       }
 
       requestAnimationFrame(renderLoop);
     }
 
-    // Exportar Vídeo com Áudio Original + Dublagem Mixados
     async function exportVideo() {
       pauseAll();
       const modal = document.getElementById('exportModal');
@@ -1099,24 +1752,33 @@
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const dest = audioCtx.createMediaStreamDestination();
 
-      // Conecta áudio do vídeo original
       const videoSource = audioCtx.createMediaElementSource(video);
       const videoGain = audioCtx.createGain();
       videoGain.gain.value = parseFloat(document.getElementById('origVol').value);
       videoSource.connect(videoGain).connect(dest);
       videoGain.connect(audioCtx.destination);
 
-      // Conecta todos os takes de dublagem
+      const ambPreset = document.getElementById('ambientPreset').value;
+      const ambExport = startAmbientLoop(audioCtx, dest, ambPreset, ambVolume);
+
       const exportDubAudios = dubTakes.map(take => {
         const a = new Audio(take.url);
+        applyVoicePresetToAudio(a, take.preset || 'normal');
         const src = audioCtx.createMediaElementSource(a);
         const g = audioCtx.createGain();
         g.gain.value = dubVolume;
-        src.connect(g).connect(dest);
+        connectVoiceNodes(audioCtx, src, g, take.preset || 'normal');
+        g.connect(dest);
         g.connect(audioCtx.destination);
-        return { audio: a, startTime: take.startTime, duration: take.duration };
+        return {
+          audio: a,
+          startTime: take.startTime,
+          sourceTrimStart: take.sourceTrimStart,
+          duration: take.duration
+        };
       });
 
+      const triggeredExportSfx = new Set();
       const canvasStream = canvas.captureStream(30);
       const combinedStream = new MediaStream([
         ...canvasStream.getVideoTracks(),
@@ -1128,6 +1790,9 @@
       recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
 
       recorder.onstop = () => {
+        if (ambExport) {
+          try { ambExport.src.stop(); } catch (_) {}
+        }
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -1141,7 +1806,7 @@
       recorder.start();
       video.play();
 
-      const totalDuration = trimEnd - trimStart;
+      const totalDuration = Math.max(0.1, trimEnd - trimStart);
       const checkInterval = setInterval(() => {
         const elapsed = video.currentTime - trimStart;
         const pct = Math.min(100, Math.round((elapsed / totalDuration) * 100));
@@ -1151,11 +1816,18 @@
         exportDubAudios.forEach(item => {
           if (video.currentTime >= item.startTime && video.currentTime < item.startTime + item.duration) {
             if (item.audio.paused) {
-              item.audio.currentTime = video.currentTime - item.startTime;
+              item.audio.currentTime = item.sourceTrimStart + (video.currentTime - item.startTime);
               item.audio.play().catch(() => {});
             }
           } else {
             item.audio.pause();
+          }
+        });
+
+        sfxEvents.forEach(ev => {
+          if (!triggeredExportSfx.has(ev.id) && video.currentTime >= ev.time) {
+            triggeredExportSfx.add(ev.id);
+            playFightSfxOnContext(audioCtx, dest, ev.type, sfxVolume);
           }
         });
 
